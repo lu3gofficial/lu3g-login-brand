@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       LU3G Login Brand
  * Description:       Personalizza la schermata di accesso a wp-admin con logo, colori e font del sito, affiancando il logo LU3G. Il pulsante "Analizza il sito" legge lo stile della homepage; i valori si possono poi ritoccare.
- * Version:           1.1.1
+ * Version:           1.2.0
  * Author:            LU3G
  * Author URI:        https://lu3g.it/
  * Plugin URI:        https://github.com/sviluppolu3g/lu3g-login-brand
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class LU3G_Login_Brand {
 
 	const OPT     = 'lu3g_login_brand';
-	const VERSION = '1.1.1';
+	const VERSION = '1.2.0';
 
 	public static function init() {
 		// schermata di accesso (il resto di wp-admin resta com'è)
@@ -88,6 +88,7 @@ final class LU3G_Login_Brand {
 			'font_css'  => array(),
 			'lu3g'      => 1,
 			'signature' => 1,
+			'motion'    => 1,          // interazioni animate (entrata, alone, pulsante, campi)
 			'analyzed'  => '',
 		);
 	}
@@ -155,6 +156,7 @@ final class LU3G_Login_Brand {
 
 		$out['lu3g']      = empty( $in['lu3g'] ) ? 0 : 1;
 		$out['signature'] = empty( $in['signature'] ) ? 0 : 1;
+		$out['motion']    = empty( $in['motion'] ) ? 0 : 1;
 		$out['analyzed']  = sanitize_text_field( $in['analyzed'] ?? '' );
 		return $out;
 	}
@@ -302,6 +304,56 @@ final class LU3G_Login_Brand {
 		$css .= 'body.login .lu3g-firma a{color:rgba(255,255,255,.8);text-decoration:none}';
 		$css .= "body.login .lu3g-firma a:hover{color:{$accent}}";
 		$css .= '@media (max-width:400px){body.login #login{width:320px;padding-top:5vh}body.login #login h1 a::before{flex-basis:120px}}';
+		if ( ! empty( $o['motion'] ) ) {
+			$css .= self::motion_css( $bg, $accent, $panel );
+		}
+		return $css;
+	}
+
+	/**
+	 * Interazioni animate della schermata di accesso (opzione "Animazioni", attiva di serie).
+	 * Tutto è dentro prefers-reduced-motion: no-preference, quindi chi ha "riduci animazioni" nel sistema operativo
+	 * vede la pagina ferma. Solo transform e opacity (GPU), niente JavaScript.
+	 * - entrata in sequenza: riga d'accento in alto, logo del sito, logo LU3G con la riga divisoria, modulo, link sotto
+	 *   ("backwards": finita l'entrata valgono di nuovo gli stili normali, così funziona il sollevamento all'hover);
+	 * - alone del colore di accento che si muove piano dietro il modulo;
+	 * - pulsante "Accedi": il colore scorre da sinistra all'hover (come i pulsanti dei siti LU3G), piccola pressione al clic;
+	 * - campi: bordo d'accento che si accende e leggero sollevamento quando ci si scrive;
+	 * - loghi: si sollevano appena al passaggio del mouse.
+	 */
+	private static function motion_css( $bg, $accent, $panel ) {
+		$glow = self::rgba( $accent, '.20' );
+		$ease = 'cubic-bezier(.22,1,.36,1)';
+		$css  = '@media (prefers-reduced-motion:no-preference){';
+		$css .= '@keyframes lu3g-in{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}';
+		$css .= '@keyframes lu3g-fade{from{opacity:0}to{opacity:1}}';
+		$css .= '@keyframes lu3g-bar{from{transform:scaleX(0)}to{transform:scaleX(1)}}';
+		$css .= '@keyframes lu3g-glow{0%{transform:translate(-30%,-20%) scale(1)}50%{transform:translate(20%,10%) scale(1.15)}100%{transform:translate(-10%,25%) scale(.95)}}';
+		// riga d'accento che si disegna da sinistra
+		$css .= "body.login::before{transform-origin:left center;animation:lu3g-bar .9s {$ease} both}";
+		// alone che si muove lentamente dietro al modulo
+		$css .= "body.login::after{content:\"\";position:fixed;left:50%;top:40%;width:70vmax;height:70vmax;margin:-35vmax 0 0 -35vmax;border-radius:50%;"
+			. "background:radial-gradient(circle,{$glow} 0%,rgba(0,0,0,0) 62%);pointer-events:none;z-index:0;animation:lu3g-glow 22s ease-in-out infinite alternate}";
+		$css .= 'body.login #login,body.login .language-switcher,body.login .lu3g-firma{position:relative;z-index:1}';
+		// entrata in sequenza
+		$css .= "body.login #login h1 a::before{animation:lu3g-in .8s {$ease} .1s backwards;transition:transform .4s {$ease}}";
+		$css .= "body.login #login h1 a::after{animation:lu3g-in .8s {$ease} .3s backwards;transition:transform .4s {$ease}}";
+		$css .= "body.login #login h1 a:hover::before,body.login #login h1 a:hover::after{transform:translateY(-3px)}";
+		if ( $panel ) {
+			$css .= "body.login #login h1 a{animation:lu3g-fade .6s ease both}";
+		}
+		$css .= "body.login form{animation:lu3g-in .9s {$ease} .35s backwards}";
+		$css .= 'body.login #nav,body.login #backtoblog,body.login .privacy-policy-page-link,body.login .language-switcher,body.login .lu3g-firma{animation:lu3g-fade .8s ease .8s both}';
+		// campi: bordo d'accento e leggero sollevamento
+		$css .= "body.login form .input,body.login input[type=\"text\"],body.login input[type=\"password\"]{transition:border-color .3s ease,box-shadow .3s ease,background-color .3s ease,transform .3s {$ease}}";
+		$css .= 'body.login form .input:focus,body.login input[type="text"]:focus,body.login input[type="password"]:focus{transform:translateY(-1px)}';
+		$css .= "body.login form p:focus-within label,body.login .user-pass-wrap:focus-within label{color:{$bg};transition:color .3s ease}";
+		// pulsante: colore che scorre da sinistra (sfondo a due colori spostato) + pressione al clic
+		$css .= "body.wp-core-ui.login .button-primary{background:linear-gradient(90deg,{$bg} 50%,{$accent} 50%) right center/202% 100% no-repeat;"
+			. "transition:background-position .6s {$ease},color .4s ease,box-shadow .3s ease,transform .15s ease}";
+		$css .= 'body.wp-core-ui.login .button-primary:hover,body.wp-core-ui.login .button-primary:focus{background-position:left center}';
+		$css .= 'body.wp-core-ui.login .button-primary:active{transform:scale(.97)}';
+		$css .= '}';
 		return $css;
 	}
 
@@ -387,6 +439,12 @@ final class LU3G_Login_Brand {
 						<th scope="row">LU3G</th>
 						<td><label><input type="checkbox" name="<?php echo esc_attr( $n ); ?>[lu3g]" value="1" <?php checked( $o['lu3g'], 1 ); ?>> Mostra il logo LU3G accanto a quello del sito</label><br>
 							<label><input type="checkbox" name="<?php echo esc_attr( $n ); ?>[signature]" value="1" <?php checked( $o['signature'], 1 ); ?>> Mostra "Sito realizzato da LU3G" in fondo</label></td>
+					</tr>
+					<tr>
+						<th scope="row">Animazioni</th>
+						<td><label><input type="checkbox" name="<?php echo esc_attr( $n ); ?>[motion]" value="1" <?php checked( $o['motion'], 1 ); ?>> Piccole interazioni animate</label>
+							<p class="description">Entrata in sequenza di loghi e modulo, alone di colore in movimento, pulsante con colore che scorre, campi che si illuminano.
+								Si spengono da sole per chi ha "riduci animazioni" nel sistema operativo.</p></td>
 					</tr>
 				</table>
 				<input type="hidden" id="lu3g-analyzed" name="<?php echo esc_attr( $n ); ?>[analyzed]" value="<?php echo esc_attr( $o['analyzed'] ); ?>">

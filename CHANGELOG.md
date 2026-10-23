@@ -1,5 +1,12 @@
 # Registro delle modifiche
 
+## 1.2.0 – 2026-10-23
+- Interazioni animate nella schermata di accesso (opzione "Animazioni" in Impostazioni → Accesso LU3G, attiva di serie):
+  entrata in sequenza di riga d'accento, loghi, modulo e link; alone del colore di accento che si muove piano sullo sfondo;
+  pulsante "Accedi" con il colore che scorre all'hover e piccola pressione al clic; campi che si illuminano e si sollevano
+  appena quando ci si scrive; loghi che si sollevano al passaggio del mouse.
+- Tutte le animazioni si spengono per chi ha "riduci animazioni" nel sistema operativo; solo CSS (transform e opacity).
+
 ## 1.1.1 – 2026-10-23
 - Repository pubblico: gli aggiornamenti arrivano senza token (LU3G_GITHUB_TOKEN resta facoltativo).
 - Collegamento al repository nella pagina dei plugin ("Plugin URI").

@@ -2,6 +2,7 @@
 
 Plugin WordPress di LU3G: personalizza **solo la schermata di accesso a wp-admin** con lo stile del sito su cui è
 installato (logo, colore scuro, colore dei pulsanti, font) e affianca il logo LU3G a quello del sito.
+Piccole interazioni animate (entrata in sequenza, alone di colore, pulsante e campi), disattivabili e spente con "riduci animazioni".
 Il resto di wp-admin non viene toccato.
 
 ## Installazione su un sito
