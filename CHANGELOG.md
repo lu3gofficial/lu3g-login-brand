@@ -1,5 +1,14 @@
 # Registro delle modifiche
 
+## 1.4.0 – 2026-10-23
+- Schermata di caricamento dopo l'accesso (opzione "Dopo l'accesso", attiva di serie): logo e riga di avanzamento per circa
+  1,3 secondi, poi dissolvenza con leggero scorrimento verso la Bacheca. Una sola volta, sulla prima pagina dopo il login;
+  la pagina si carica intanto sotto; solo CSS; con "riduci animazioni" solo una dissolvenza breve.
+  Anteprima per gli amministratori: `?lu3g_splash=1` su una pagina di wp-admin.
+- Aspetto "Report LU3G": testo dei campi sempre leggibile anche in hover, clic, focus e con il riempimento automatico del
+  browser (prima, con l'autocompletamento di Chrome attivo, il fondo tornava chiaro sotto al testo bianco); pagina dichiarata
+  scura al browser (color-scheme: dark), come nell'app.
+
 ## 1.3.2 – 2026-10-23
 - Aspetto "Report LU3G" da telefono: margini laterali di 24px come nell'app.
 

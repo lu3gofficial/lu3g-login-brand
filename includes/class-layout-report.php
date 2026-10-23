@@ -73,7 +73,9 @@ final class LU3G_Login_Report {
 		$css .= "@font-face{font-family:\"Manrope Variable\";font-style:normal;font-display:swap;font-weight:200 800;src:url(\"{$fonts}manrope-latin-wght.woff2\") format(\"woff2-variations\")}";
 
 		// pagina e colonna centrale
-		$css .= "html{background:{$p}}";
+		// color-scheme: dark (come nell'app) dice al browser che la pagina è scura: autocompletamento, barre e controlli
+		// nativi usano colori scuri invece dell'azzurro/giallo chiaro
+		$css .= "html{background:{$p};color-scheme:dark}";
 		$css .= "body.login{background:{$p};color:{$ink};font-family:{$dm};font-size:14px;-webkit-font-smoothing:antialiased;"
 			. 'display:flex;flex-direction:column;justify-content:center;min-height:100vh;min-height:100dvh;margin:0}';
 		// 390px di contenuto + 24px di margine per lato; width:100% serve perché nel body flessibile, con margin:auto,
@@ -99,8 +101,21 @@ final class LU3G_Login_Report {
 		$css .= "body.login form .input::placeholder,body.login input::placeholder{color:{$mut};opacity:1}";
 		$css .= "body.login form .input:focus,body.login input[type=\"text\"]:focus,body.login input[type=\"email\"]:focus,body.login input[type=\"password\"]:focus{"
 			. "border-color:{$mut};box-shadow:0 0 0 3px rgba(255,255,255,.07);outline:none}";
-		// riempimento automatico del browser: resta scuro
-		$css .= "body.login input:-webkit-autofill{-webkit-text-fill-color:{$ink};box-shadow:0 0 0 100px {$sur} inset;caret-color:{$ink}}";
+		// stati dei campi: testo sempre #fafafa su fondo scuro, anche con passaggio del mouse, clic e focus
+		$fields = array( 'body.login form .input', 'body.login input[type="text"]', 'body.login input[type="email"]', 'body.login input[type="password"]' );
+		$state  = static function ( $suffix ) use ( $fields ) {
+			return implode( ',', array_map( static function ( $f ) use ( $suffix ) { return $f . $suffix; }, $fields ) );
+		};
+		$css .= $state( ':hover' ) . "{border-color:#3f3f46;background-color:{$sur};color:{$ink}}";
+		$css .= $state( ':active' ) . ',' . $state( ':focus' ) . "{background-color:{$sur};color:{$ink};-webkit-text-fill-color:{$ink}}";
+		// riempimento automatico (Chrome, Safari, Edge): il browser impone il suo fondo chiaro; lo copro con un'ombra interna
+		// scura e lo ritardo all'infinito con la transizione. Le regole valgono anche in hover/focus, dove prima l'ombra del
+		// focus sostituiva quella interna e tornava fuori il fondo chiaro sotto al testo bianco.
+		$auto  = 'body.login input:-webkit-autofill,body.login input:-webkit-autofill:hover,body.login input:-webkit-autofill:active,body.login input:autofill';
+		$css  .= $auto . "{-webkit-text-fill-color:{$ink};color:{$ink};caret-color:{$ink};box-shadow:0 0 0 100px {$sur} inset;"
+			. 'transition:background-color 600000s 0s,color 600000s 0s,border-color .15s}';
+		$css  .= "body.login input:-webkit-autofill:focus,body.login input:autofill:focus{-webkit-text-fill-color:{$ink};border-color:{$mut};"
+			. "box-shadow:0 0 0 100px {$sur} inset,0 0 0 3px rgba(255,255,255,.07)}";
 
 		// password: occhio a destra, come nell'app
 		$css .= 'body.login .wp-pwd{position:relative}';

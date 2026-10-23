@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       LU3G Login Brand
  * Description:       Personalizza la schermata di accesso a wp-admin con logo, colori e font del sito, affiancando il logo LU3G. Il pulsante "Analizza il sito" legge lo stile della homepage; i valori si possono poi ritoccare.
- * Version:           1.3.2
+ * Version:           1.4.0
  * Author:            LU3G
  * Author URI:        https://lu3g.it/
  * Plugin URI:        https://github.com/sviluppolu3g/lu3g-login-brand
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class LU3G_Login_Brand {
 
 	const OPT     = 'lu3g_login_brand';
-	const VERSION = '1.3.2';
+	const VERSION = '1.4.0';
 
 	public static function init() {
 		// schermata di accesso (il resto di wp-admin resta com'è)
@@ -91,6 +91,7 @@ final class LU3G_Login_Brand {
 			'lu3g'      => 1,
 			'signature' => 1,
 			'motion'    => 1,          // interazioni animate (entrata, alone, pulsante, campi)
+			'splash'    => 1,          // schermata di caricamento dopo l'accesso
 			'layout'    => 'report',   // aspetto: report = come report.lu3g.com/login; sito = colori e logo del sito
 			'title'     => 'Accedi al sito',
 			'button'    => 'Accedi al pannello',
@@ -162,6 +163,7 @@ final class LU3G_Login_Brand {
 		$out['lu3g']      = empty( $in['lu3g'] ) ? 0 : 1;
 		$out['signature'] = empty( $in['signature'] ) ? 0 : 1;
 		$out['motion']    = empty( $in['motion'] ) ? 0 : 1;
+		$out['splash']    = empty( $in['splash'] ) ? 0 : 1;
 		$out['layout']    = ( 'sito' === ( $in['layout'] ?? '' ) ) ? 'sito' : 'report';
 		$out['title']     = substr( sanitize_text_field( $in['title'] ?? '' ), 0, 80 );
 		$out['button']    = substr( sanitize_text_field( $in['button'] ?? '' ), 0, 60 );
@@ -261,7 +263,7 @@ final class LU3G_Login_Brand {
 		}
 	}
 
-	private static function lu3g_logo( $tone ) {
+	public static function lu3g_logo( $tone ) {
 		$file = plugin_dir_path( __FILE__ ) . 'assets/lu3g-' . ( 'dark' === $tone ? 'scuro' : 'chiaro' ) . '.svg';
 		return is_readable( $file ) ? 'data:image/svg+xml;base64,' . base64_encode( (string) file_get_contents( $file ) ) : '';
 	}
@@ -485,6 +487,12 @@ final class LU3G_Login_Brand {
 							<label><input type="checkbox" name="<?php echo esc_attr( $n ); ?>[signature]" value="1" <?php checked( $o['signature'], 1 ); ?>> Mostra "Sito realizzato da LU3G" in fondo</label></td>
 					</tr>
 					<tr>
+						<th scope="row">Dopo l'accesso</th>
+						<td><label><input type="checkbox" name="<?php echo esc_attr( $n ); ?>[splash]" value="1" <?php checked( $o['splash'], 1 ); ?>> Schermata di caricamento</label>
+							<p class="description">Una sola volta, sulla prima pagina dopo il login: logo e riga di avanzamento per circa 1,3 secondi, poi dissolvenza verso la Bacheca.
+								La pagina si carica intanto sotto. <a href="<?php echo esc_url( admin_url( '?lu3g_splash=1' ) ); ?>">Vedi l'anteprima</a></p></td>
+					</tr>
+					<tr>
 						<th scope="row">Animazioni</th>
 						<td><label><input type="checkbox" name="<?php echo esc_attr( $n ); ?>[motion]" value="1" <?php checked( $o['motion'], 1 ); ?>> Piccole interazioni animate</label>
 							<p class="description">Entrata in sequenza di loghi e modulo, alone di colore in movimento, pulsante con colore che scorre, campi che si illuminano.
@@ -504,5 +512,7 @@ LU3G_Login_Brand::init();
 
 // aggiornamenti dalle release GitHub (vedi includes/class-updater.php)
 require_once __DIR__ . '/includes/class-layout-report.php';
+require_once __DIR__ . '/includes/class-splash.php';
+LU3G_Login_Splash::init();
 require_once __DIR__ . '/includes/class-updater.php';
 LU3G_Login_Brand_Updater::init( __FILE__ );
