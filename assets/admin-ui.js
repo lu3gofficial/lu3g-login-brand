@@ -77,6 +77,15 @@
 			logos.style.background = ''; logos.style.padding = ''; logos.style.borderRadius = '';
 		}
 		$$('.lu3g-color').forEach(function (c) { $('code', c).textContent = $('input', c).value; });
+
+		// schermata di caricamento: scelta dell'animazione visibile solo se è attiva; link di prova con l'animazione scelta
+		var splashOn = field('splash') && field('splash').checked;
+		$('#lu3g-anims').hidden = !splashOn;
+		var style = checked('splash_style') || 'linea';
+		$('#lu3g-splash-try').href = $('#lu3g-splash-try').href.replace(/lu3g_splash_style=[a-z]*/, 'lu3g_splash_style=' + style);
+		$('#lu3g-anims').style.setProperty('--anim-logo', 'url("' + (layout === 'sito' && logo ? logo.replace(/"/g, '%22') : LU3GLogin.lu3g) + '")');
+		$('#lu3g-anims').style.setProperty('--anim-bg', layout === 'sito' ? field('bg').value : '#09090b');
+		$('#lu3g-anims').style.setProperty('--anim-line', layout === 'sito' ? field('accent').value : '#fafafa');
 	}
 	function rgb(h) { h = h.replace('#', ''); return [0, 2, 4].map(function (i) { return parseInt(h.substr(i, 2), 16) || 0; }); }
 	function shade(h, t) { return '#' + rgb(h).map(function (v) { return ('0' + Math.round(v * (1 - t)).toString(16)).slice(-2); }).join(''); }

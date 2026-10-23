@@ -149,7 +149,21 @@ final class LU3G_Login_Admin {
 					<section class="lu3g-card">
 						<h2>Effetti</h2>
 						<?php self::toggle( $n, 'motion', $o, 'Animazioni', 'Entrata in sequenza di logo, titolo e modulo; pulsante e campi animati. Spente per chi ha "riduci animazioni".' ); ?>
-						<?php self::toggle( $n, 'splash', $o, 'Schermata di caricamento dopo l\'accesso', 'Una volta, sulla prima pagina dopo il login: circa 1,3 secondi, poi dissolvenza. <a href="' . esc_url( admin_url( '?lu3g_splash=1' ) ) . '" target="_blank">Vedi l\'anteprima</a>' ); ?>
+						<?php self::toggle( $n, 'splash', $o, 'Schermata di caricamento dopo l\'accesso', 'Una volta, sulla prima pagina dopo il login, per circa 1,5 secondi; la pagina si carica intanto sotto.' ); ?>
+						<div class="lu3g-anims" id="lu3g-anims">
+							<p class="lu3g-label">Animazione</p>
+							<div class="lu3g-anims__grid" role="radiogroup" aria-label="Animazione della schermata di caricamento">
+								<?php foreach ( LU3G_Login_Splash::styles() as $key => $info ) : ?>
+									<label class="lu3g-anim lu3g-anim--<?php echo esc_attr( $key ); ?>" title="<?php echo esc_attr( $info[1] ); ?>">
+										<input type="radio" name="<?php echo esc_attr( $n ); ?>[splash_style]" value="<?php echo esc_attr( $key ); ?>" <?php checked( $o['splash_style'], $key ); ?>>
+										<span class="lu3g-anim__stage" aria-hidden="true"><span class="lu3g-anim__curtain"></span><span class="lu3g-anim__fx"></span><span class="lu3g-anim__logo"></span></span>
+										<strong><?php echo esc_html( $info[0] ); ?></strong>
+										<small><?php echo esc_html( $info[1] ); ?></small>
+									</label>
+								<?php endforeach; ?>
+							</div>
+							<a class="lu3g-btn lu3g-btn--ghost lu3g-anims__try" id="lu3g-splash-try" href="<?php echo esc_url( admin_url( '?lu3g_splash=1&lu3g_splash_style=' . $o['splash_style'] ) ); ?>" target="_blank" rel="noopener">Prova a schermo intero ↗</a>
+						</div>
 					</section>
 
 					<section class="lu3g-card lu3g-only-sito">

@@ -1,5 +1,12 @@
 # Registro delle modifiche
 
+## 1.6.0 – 2026-10-23
+- Schermata di caricamento dopo l'accesso: sei animazioni a scelta (Linea, Dissolvenza, Pulsazione, Anello, Sipario,
+  Cerchio), ognuna con una miniatura animata nelle impostazioni e il pulsante "Prova a schermo intero".
+- Logo ed effetti della schermata in un piccolo elemento stampato all'apertura della pagina (in_admin_header /
+  wp_body_open); lo sfondo resta html::before, presente dal primo disegno. Sempre solo CSS e una volta sola dopo il login.
+- Anteprima per gli amministratori: `?lu3g_splash=1&lu3g_splash_style=<nome>`.
+
 ## 1.5.0 – 2026-10-23
 - Nuova pagina delle impostazioni: intestazione LU3G, schede (Aspetto, Testi, Font, Colori e logo del sito, Effetti,
   Firma LU3G), anteprima della schermata di accesso che si aggiorna mentre si modificano i campi, barra "Salva" fissa
