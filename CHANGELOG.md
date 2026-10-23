@@ -1,5 +1,8 @@
 # Registro delle modifiche
 
+## 1.3.1 – 2026-10-23
+- Aspetto "Report LU3G": la colonna è larga 390px come nell'app (prima si stringeva al contenuto).
+
 ## 1.3.0 – 2026-10-23
 - Nuovo aspetto "Report LU3G" (predefinito): la schermata di https://report.lu3g.com/login riprodotta in WordPress.
   Fondo #09090b, colonna di 390px, logo LU3G 46px, titolo in Manrope, campi scuri, occhio della password con l'icona

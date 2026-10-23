@@ -76,7 +76,9 @@ final class LU3G_Login_Report {
 		$css .= "html{background:{$p}}";
 		$css .= "body.login{background:{$p};color:{$ink};font-family:{$dm};font-size:14px;-webkit-font-smoothing:antialiased;"
 			. 'display:flex;flex-direction:column;justify-content:center;min-height:100vh;min-height:100dvh;margin:0}';
-		$css .= 'body.login #login{width:auto;max-width:390px;margin:0 auto;padding:48px 24px;box-sizing:content-box}';
+		// 390px di contenuto + 24px di margine per lato; width:100% serve perché nel body flessibile, con margin:auto,
+		// la colonna altrimenti si stringe al contenuto
+		$css .= 'body.login #login{width:100%;max-width:438px;margin:0 auto;padding:48px 24px;box-sizing:border-box}';
 		$css .= 'body.login #login *{box-sizing:border-box}';
 
 		// logo LU3G 46px, a sinistra
@@ -150,7 +152,7 @@ final class LU3G_Login_Report {
 		$css .= "body.login .description,body.login .indicator-hint{color:{$mut}}";
 		$css .= "body.login #pass-strength-result{background:{$sur};border-color:{$line};color:{$ink};border-radius:6px}";
 
-		$css .= '@media (max-width:600px){body.login #login{padding:37px 25px 50px}}';
+		$css .= '@media (max-width:600px){body.login #login{max-width:440px;padding:37px 25px 50px}}';
 
 		// animazione d'entrata leggera (opzione "Animazioni"; mai con "riduci animazioni")
 		if ( ! empty( $o['motion'] ) ) {
