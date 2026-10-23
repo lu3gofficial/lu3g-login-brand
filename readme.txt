@@ -1,5 +1,5 @@
 === LU3G Login Brand ===
-Versione: 1.2.0
+Versione: 1.2.1
 Richiede: WordPress 6.0+, PHP 7.4+
 
 Personalizza la sola schermata di accesso a wp-admin con lo stile del sito su cui è installato

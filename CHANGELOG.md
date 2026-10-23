@@ -1,6 +1,6 @@
 # Registro delle modifiche
 
-## Non ancora rilasciato
+## 1.2.1 – 2026-10-23
 - "Controlla di nuovo" in Bacheca → Aggiornamenti rilegge subito GitHub (prima poteva usare la release in cache fino a 6 ore).
 
 ## 1.2.0 – 2026-10-23
