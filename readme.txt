@@ -1,5 +1,5 @@
 === LU3G Login Brand ===
-Versione: 1.4.0
+Versione: 1.5.0
 Richiede: WordPress 6.0+, PHP 7.4+
 
 Personalizza la sola schermata di accesso a wp-admin con lo stile del sito su cui è installato
@@ -30,6 +30,8 @@ le nuove versioni compaiono in Bacheca → Aggiornamenti, senza configurare null
 
 == Font ==
 DM Sans e Manrope (assets/fonts) sono distribuiti con licenza SIL Open Font License 1.1.
+Gli altri Google Fonts si scelgono in Impostazioni → Accesso LU3G → Font: al salvataggio il font scelto viene scaricato in
+wp-content/uploads/lu3g-login-brand/fonts/ e la pagina di accesso lo carica dal sito (ogni font mantiene la sua licenza, OFL o Apache).
 
 == Note ==
 - Nessun file esterno: i due loghi LU3G (per fondo scuro e per fondo chiaro) sono nella cartella assets.

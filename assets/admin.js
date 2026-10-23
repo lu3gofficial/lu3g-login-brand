@@ -178,6 +178,9 @@
 			$('lu3g-font-css').value = res.css.join('\n');
 			$('lu3g-analyzed').value = new Date().toISOString().slice(0, 16).replace('T', ' ');
 			status.textContent = 'Fatto: controlla i valori qui sotto e premi Salva.' + (res.logo ? '' : ' Logo non trovato: sceglilo dalla libreria.');
+			// aggiorna l'anteprima della pagina (assets/admin-ui.js ascolta "change" sul modulo)
+			var form = document.getElementById('lu3g-form');
+			if (form) form.dispatchEvent(new Event('change', { bubbles: true }));
 		}
 	}
 	btn.addEventListener('click', analyze);
@@ -189,6 +192,7 @@
 		frame.off('select').on('select', function () {
 			var a = frame.state().get('selection').first().toJSON();
 			$('lu3g-logo').value = a.url;
+			$('lu3g-logo').dispatchEvent(new Event('input', { bubbles: true }));
 		});
 		frame.open();
 	});

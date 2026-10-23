@@ -12,7 +12,7 @@ Il resto di wp-admin non viene toccato.
 ## Installazione su un sito
 1. Scarica `lu3g-login-brand.zip` dall'ultima [release](../../releases/latest).
 2. WordPress → Plugin → Aggiungi nuovo → Carica plugin → Attiva.
-3. Impostazioni → Accesso LU3G → **Analizza il sito** → controlla i valori → Salva.
+3. Impostazioni → Accesso LU3G: scegli l'aspetto, i testi e i font (tutti i Google Fonts); con "Colori del sito" premi **Analizza il sito**; Salva.
 4. Gli aggiornamenti arrivano da soli dalle release di questo repository (Bacheca → Aggiornamenti): non serve configurare nulla.
    Facoltativo: `define( 'LU3G_GITHUB_TOKEN', 'github_pat_...' );` in `wp-config.php` alza il limite di richieste all'API GitHub.
 
@@ -38,5 +38,7 @@ Pacchetto in locale: `sh bin/build.sh` → `dist/lu3g-login-brand.zip`.
 - `assets/lu3g-chiaro.svg`, `assets/lu3g-scuro.svg` – logo LU3G per fondi scuri e per fondi chiari.
 - `includes/class-layout-report.php` – aspetto "Report LU3G".
 - `includes/class-splash.php` – schermata di caricamento dopo l'accesso.
+- `includes/class-fonts.php` – Google Fonts: elenco (`assets/data/google-fonts.json`) e importazione sul sito al salvataggio.
+- `includes/class-admin.php`, `assets/admin.css`, `assets/admin-ui.js` – pagina delle impostazioni con anteprima.
 - `assets/fonts/` – DM Sans e Manrope (variabili, latin), licenza SIL Open Font License 1.1.
 - `includes/class-updater.php` – aggiornamenti dalle release GitHub.

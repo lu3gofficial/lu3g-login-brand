@@ -1,5 +1,14 @@
 # Registro delle modifiche
 
+## 1.5.0 – 2026-10-23
+- Nuova pagina delle impostazioni: intestazione LU3G, schede (Aspetto, Testi, Font, Colori e logo del sito, Effetti,
+  Firma LU3G), anteprima della schermata di accesso che si aggiorna mentre si modificano i campi, barra "Salva" fissa
+  con avviso di modifiche non salvate.
+- Tutti i Google Fonts (1.829 famiglie con caratteri latini) selezionabili per titoli e testi, con ricerca, filtro per
+  categoria e anteprima del font. Al salvataggio il font viene scaricato sul sito (wp-content/uploads/lu3g-login-brand/fonts):
+  la pagina di accesso non contatta Google.
+- "Analizza il sito" aggiorna subito l'anteprima.
+
 ## 1.4.0 – 2026-10-23
 - Schermata di caricamento dopo l'accesso (opzione "Dopo l'accesso", attiva di serie): logo e riga di avanzamento per circa
   1,3 secondi, poi dissolvenza con leggero scorrimento verso la Bacheca. Una sola volta, sulla prima pagina dopo il login;

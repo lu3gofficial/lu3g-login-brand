@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       LU3G Login Brand
  * Description:       Personalizza la schermata di accesso a wp-admin con logo, colori e font del sito, affiancando il logo LU3G. Il pulsante "Analizza il sito" legge lo stile della homepage; i valori si possono poi ritoccare.
- * Version:           1.4.0
+ * Version:           1.5.0
  * Author:            LU3G
  * Author URI:        https://lu3g.it/
  * Plugin URI:        https://github.com/sviluppolu3g/lu3g-login-brand
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class LU3G_Login_Brand {
 
 	const OPT     = 'lu3g_login_brand';
-	const VERSION = '1.4.0';
+	const VERSION = '1.5.0';
 
 	public static function init() {
 		// schermata di accesso (il resto di wp-admin resta com'è)
@@ -92,6 +92,8 @@ final class LU3G_Login_Brand {
 			'signature' => 1,
 			'motion'    => 1,          // interazioni animate (entrata, alone, pulsante, campi)
 			'splash'    => 1,          // schermata di caricamento dopo l'accesso
+			'font_head' => '',         // Google Font dei titoli ('' = predefinito: Manrope o font del sito)
+			'font_body' => '',         // Google Font di testi, campi e pulsante ('' = DM Sans o font del sito)
 			'layout'    => 'report',   // aspetto: report = come report.lu3g.com/login; sito = colori e logo del sito
 			'title'     => 'Accedi al sito',
 			'button'    => 'Accedi al pannello',
@@ -168,6 +170,26 @@ final class LU3G_Login_Brand {
 		$out['title']     = substr( sanitize_text_field( $in['title'] ?? '' ), 0, 80 );
 		$out['button']    = substr( sanitize_text_field( $in['button'] ?? '' ), 0, 60 );
 		$out['analyzed']  = sanitize_text_field( $in['analyzed'] ?? '' );
+
+		// Google Fonts scelti: si scaricano sul sito al salvataggio (se Google non risponde resta il predefinito)
+		foreach ( array( 'font_head', 'font_body' ) as $key ) {
+			$family      = trim( sanitize_text_field( $in[ $key ] ?? '' ) );
+			$out[ $key ] = '';
+			if ( '' === $family ) {
+				continue;
+			}
+			$f = LU3G_Login_Fonts::find( $family );
+			if ( ! $f ) {
+				add_settings_error( self::OPT, 'lu3g-font-' . $key, '"' . $family . '" non è nell\'elenco dei Google Fonts: resta il font predefinito.' );
+				continue;
+			}
+			$res = LU3G_Login_Fonts::import( $f[0] );
+			if ( is_wp_error( $res ) ) {
+				add_settings_error( self::OPT, 'lu3g-font-' . $key, $res->get_error_message() . ' Resta il font predefinito.' );
+				continue;
+			}
+			$out[ $key ] = $f[0];
+		}
 		return $out;
 	}
 
@@ -270,6 +292,13 @@ final class LU3G_Login_Brand {
 
 	public static function login_styles() {
 		$o = self::get();
+		// Google Fonts scelti nelle impostazioni, dalla copia scaricata sul sito
+		foreach ( array_unique( array_filter( array( $o['font_head'], $o['font_body'] ) ) ) as $i => $family ) {
+			$css = LU3G_Login_Fonts::local_css( $family );
+			if ( $css ) {
+				wp_enqueue_style( 'lu3g-login-gfont-' . $i, $css, array(), null );
+			}
+		}
 		if ( 'report' === $o['layout'] ) {
 			echo '<style id="lu3g-login-brand">' . LU3G_Login_Report::css( $o, __FILE__, self::lu3g_logo( 'light' ) ) . '</style>' . "\n";
 			return;
@@ -288,7 +317,7 @@ final class LU3G_Login_Brand {
 		$accent = $o['accent'];
 		$on_acc = self::luminance( $accent ) > 0.45 ? $bg2 : '#ffffff';    // testo sul pulsante, sempre leggibile
 		$ink    = self::luminance( $bg ) < 0.5 ? $bg2 : '#1d2327';         // testo scuro dentro il modulo
-		$font   = $o['font'] ? $o['font'] . ', ' : '';
+		$font   = $o['font_body'] ? LU3G_Login_Fonts::stack( $o['font_body'] ) . ', ' : ( $o['font'] ? $o['font'] . ', ' : '' );
 		$panel  = 'dark' === $o['logo_tone'];                             // logo scuro: loghi su un riquadro bianco
 		$line   = $panel ? 'rgba(0,0,0,.14)' : 'rgba(255,255,255,.28)';
 		$logo   = $o['logo'];
@@ -416,101 +445,24 @@ final class LU3G_Login_Brand {
 	}
 
 	public static function admin_assets( $hook ) {
-		if ( 'settings_page_lu3g-login-brand' !== $hook ) {
-			return;
+		if ( 'settings_page_lu3g-login-brand' === $hook ) {
+			LU3G_Login_Admin::assets( __FILE__, self::VERSION, self::OPT );   // vedi includes/class-admin.php
 		}
-		wp_enqueue_media();
-		wp_enqueue_script( 'lu3g-login-brand', plugins_url( 'assets/admin.js', __FILE__ ), array(), self::VERSION, true );
-		wp_localize_script( 'lu3g-login-brand', 'LU3GLogin', array(
-			'home' => home_url( '/' ),
-			'opt'  => self::OPT,
-		) );
 	}
 
 	public static function page() {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return;
+		if ( current_user_can( 'manage_options' ) ) {
+			LU3G_Login_Admin::page( self::get(), self::OPT, self::VERSION );   // vedi includes/class-admin.php
 		}
-		$o = self::get();
-		$n = self::OPT;
-		?>
-		<div class="wrap lu3g-wrap">
-			<h1>Accesso LU3G</h1>
-			<p>Personalizza la schermata di accesso a wp-admin con lo stile del sito. Premi <strong>Analizza il sito</strong>: legge logo, colori e font
-				della homepage così come vengono mostrati. Poi controlla i valori, ritoccali se serve e salva.</p>
-			<p>
-				<button type="button" class="button button-secondary" id="lu3g-analyze">Analizza il sito</button>
-				<span id="lu3g-status" style="margin-left:8px"></span>
-			</p>
-			<form method="post" action="options.php">
-				<?php settings_fields( 'lu3g_login_brand' ); ?>
-				<table class="form-table" role="presentation">
-					<tr>
-						<th scope="row">Aspetto</th>
-						<td><label><input type="radio" name="<?php echo esc_attr( $n ); ?>[layout]" value="report" <?php checked( $o['layout'], 'report' ); ?>> Report LU3G: scuro e minimale, come report.lu3g.com</label><br>
-							<label><input type="radio" name="<?php echo esc_attr( $n ); ?>[layout]" value="sito" <?php checked( $o['layout'], 'sito' ); ?>> Colori del sito: logo del sito accanto al logo LU3G, colori e font letti con "Analizza il sito"</label></td>
-					</tr>
-					<tr>
-						<th scope="row"><label for="lu3g-title">Titolo e pulsante</label></th>
-						<td><input type="text" class="regular-text" id="lu3g-title" name="<?php echo esc_attr( $n ); ?>[title]" value="<?php echo esc_attr( $o['title'] ); ?>" placeholder="Accedi al sito"><br>
-							<input type="text" class="regular-text" id="lu3g-button" name="<?php echo esc_attr( $n ); ?>[button]" value="<?php echo esc_attr( $o['button'] ); ?>" placeholder="Accedi al pannello" style="margin-top:6px">
-							<p class="description">Solo per l'aspetto "Report LU3G": titolo sopra il modulo e testo del pulsante.</p></td>
-					</tr>
-					<tr>
-						<th scope="row"><label for="lu3g-logo">Logo del sito</label></th>
-						<td>
-							<input type="text" class="large-text code" id="lu3g-logo" name="<?php echo esc_attr( $n ); ?>[logo]" value="<?php echo esc_attr( $o['logo'] ); ?>">
-							<p><button type="button" class="button" id="lu3g-media">Scegli dalla libreria</button></p>
-							<p><label><input type="radio" name="<?php echo esc_attr( $n ); ?>[logo_tone]" value="light" <?php checked( $o['logo_tone'], 'light' ); ?>> Logo chiaro: sta direttamente sul fondo scuro</label><br>
-							<label><input type="radio" name="<?php echo esc_attr( $n ); ?>[logo_tone]" value="dark" <?php checked( $o['logo_tone'], 'dark' ); ?>> Logo scuro: i loghi vanno su un riquadro bianco</label></p>
-						</td>
-					</tr>
-					<tr>
-						<th scope="row"><label for="lu3g-bg">Colore di fondo</label></th>
-						<td><input type="color" id="lu3g-bg" name="<?php echo esc_attr( $n ); ?>[bg]" value="<?php echo esc_attr( $o['bg'] ); ?>">
-							<p class="description">Il colore scuro principale del sito (header, footer, sezioni scure).</p></td>
-					</tr>
-					<tr>
-						<th scope="row"><label for="lu3g-accent">Colore di accento</label></th>
-						<td><input type="color" id="lu3g-accent" name="<?php echo esc_attr( $n ); ?>[accent]" value="<?php echo esc_attr( $o['accent'] ); ?>">
-							<p class="description">Il colore dei pulsanti: pulsante "Accedi", riga in alto, bordi attivi.</p></td>
-					</tr>
-					<tr>
-						<th scope="row"><label for="lu3g-font">Font</label></th>
-						<td><input type="text" class="regular-text" id="lu3g-font" name="<?php echo esc_attr( $n ); ?>[font]" value="<?php echo esc_attr( $o['font'] ); ?>">
-							<p class="description">Vuoto = font di sistema.</p>
-							<textarea class="large-text code" rows="2" id="lu3g-font-css" name="<?php echo esc_attr( $n ); ?>[font_css]" placeholder="Fogli di stile del font (uno per riga), trovati dall'analisi"><?php echo esc_textarea( implode( "\n", $o['font_css'] ) ); ?></textarea></td>
-					</tr>
-					<tr>
-						<th scope="row">LU3G</th>
-						<td><label><input type="checkbox" name="<?php echo esc_attr( $n ); ?>[lu3g]" value="1" <?php checked( $o['lu3g'], 1 ); ?>> Mostra il logo LU3G accanto a quello del sito</label><br>
-							<label><input type="checkbox" name="<?php echo esc_attr( $n ); ?>[signature]" value="1" <?php checked( $o['signature'], 1 ); ?>> Mostra "Sito realizzato da LU3G" in fondo</label></td>
-					</tr>
-					<tr>
-						<th scope="row">Dopo l'accesso</th>
-						<td><label><input type="checkbox" name="<?php echo esc_attr( $n ); ?>[splash]" value="1" <?php checked( $o['splash'], 1 ); ?>> Schermata di caricamento</label>
-							<p class="description">Una sola volta, sulla prima pagina dopo il login: logo e riga di avanzamento per circa 1,3 secondi, poi dissolvenza verso la Bacheca.
-								La pagina si carica intanto sotto. <a href="<?php echo esc_url( admin_url( '?lu3g_splash=1' ) ); ?>">Vedi l'anteprima</a></p></td>
-					</tr>
-					<tr>
-						<th scope="row">Animazioni</th>
-						<td><label><input type="checkbox" name="<?php echo esc_attr( $n ); ?>[motion]" value="1" <?php checked( $o['motion'], 1 ); ?>> Piccole interazioni animate</label>
-							<p class="description">Entrata in sequenza di loghi e modulo, alone di colore in movimento, pulsante con colore che scorre, campi che si illuminano.
-								Si spengono da sole per chi ha "riduci animazioni" nel sistema operativo.</p></td>
-					</tr>
-				</table>
-				<input type="hidden" id="lu3g-analyzed" name="<?php echo esc_attr( $n ); ?>[analyzed]" value="<?php echo esc_attr( $o['analyzed'] ); ?>">
-				<?php submit_button( 'Salva' ); ?>
-				<p><a href="<?php echo esc_url( wp_login_url() ); ?>" target="_blank" rel="noopener">Apri la schermata di accesso</a> (in una finestra privata, per vederla da non collegato).</p>
-			</form>
-		</div>
-		<?php
 	}
 }
 
 LU3G_Login_Brand::init();
 
 // aggiornamenti dalle release GitHub (vedi includes/class-updater.php)
+require_once __DIR__ . '/includes/class-fonts.php';
+LU3G_Login_Fonts::init( __FILE__ );
+require_once __DIR__ . '/includes/class-admin.php';
 require_once __DIR__ . '/includes/class-layout-report.php';
 require_once __DIR__ . '/includes/class-splash.php';
 LU3G_Login_Splash::init();

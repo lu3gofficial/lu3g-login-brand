@@ -66,7 +66,9 @@ final class LU3G_Login_Report {
 		$line  = self::LINE;
 		$sur   = self::SURFACE;
 		$rai   = self::RAISED;
-		$dm    = '"DM Sans Variable",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
+		// font: DM Sans (testi) e Manrope (titoli) inclusi nel plugin, oppure i Google Fonts scelti nelle impostazioni
+		$dm    = ( $o['font_body'] ?? '' ) ? LU3G_Login_Fonts::stack( $o['font_body'] ) : '"DM Sans Variable",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
+		$head  = ( $o['font_head'] ?? '' ) ? LU3G_Login_Fonts::stack( $o['font_head'] ) : '"Manrope Variable",sans-serif';
 
 		// font (stessi file dell'app: latin, variabili)
 		$css  = "@font-face{font-family:\"DM Sans Variable\";font-style:normal;font-display:swap;font-weight:100 1000;src:url(\"{$fonts}dm-sans-latin-wght.woff2\") format(\"woff2-variations\")}";
@@ -89,7 +91,7 @@ final class LU3G_Login_Report {
 			. 'text-indent:-9999px;overflow:hidden;outline-offset:3px}';
 
 		// titolo
-		$css .= "body.login .lu3g-titolo{margin:0 0 28px;font-family:\"Manrope Variable\",sans-serif;font-size:30px;font-weight:700;line-height:1.3;letter-spacing:-1px;color:{$ink}}";
+		$css .= "body.login .lu3g-titolo{margin:0 0 28px;font-family:{$head};font-size:30px;font-weight:700;line-height:1.3;letter-spacing:-1px;color:{$ink}}";
 
 		// modulo
 		$css .= 'body.login form{margin:0;padding:0;background:none;border:0;box-shadow:none;overflow:visible;display:grid;gap:20px}';
