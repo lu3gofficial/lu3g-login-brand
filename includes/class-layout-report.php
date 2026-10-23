@@ -152,7 +152,7 @@ final class LU3G_Login_Report {
 		$css .= "body.login .description,body.login .indicator-hint{color:{$mut}}";
 		$css .= "body.login #pass-strength-result{background:{$sur};border-color:{$line};color:{$ink};border-radius:6px}";
 
-		$css .= '@media (max-width:600px){body.login #login{max-width:440px;padding:37px 25px 50px}}';
+		// da telefono l'app tiene lo stesso margine di 24px (la sua regola per il mobile è sovrascritta): nessuna regola qui
 
 		// animazione d'entrata leggera (opzione "Animazioni"; mai con "riduci animazioni")
 		if ( ! empty( $o['motion'] ) ) {

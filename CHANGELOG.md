@@ -1,5 +1,8 @@
 # Registro delle modifiche
 
+## 1.3.2 – 2026-10-23
+- Aspetto "Report LU3G" da telefono: margini laterali di 24px come nell'app.
+
 ## 1.3.1 – 2026-10-23
 - Aspetto "Report LU3G": la colonna è larga 390px come nell'app (prima si stringeva al contenuto).
 
