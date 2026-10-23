@@ -1,7 +1,11 @@
 # Registro delle modifiche
 
+## 1.1.1 – 2026-10-23
+- Repository pubblico: gli aggiornamenti arrivano senza token (LU3G_GITHUB_TOKEN resta facoltativo).
+- Collegamento al repository nella pagina dei plugin ("Plugin URI").
+
 ## 1.1.0 – 2026-10-23
-- Aggiornamenti automatici dal repository GitHub privato (token di sola lettura in wp-config.php: `LU3G_GITHUB_TOKEN`).
+- Aggiornamenti automatici dalle release GitHub.
 - Logo LU3G per fondi chiari: lettere bianche con una classe esplicita (prima restavano nere in alcuni visualizzatori).
 
 ## 1.0.0 – 2026-10-23

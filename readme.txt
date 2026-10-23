@@ -1,5 +1,5 @@
 === LU3G Login Brand ===
-Versione: 1.1.0
+Versione: 1.1.1
 Richiede: WordPress 6.0+, PHP 7.4+
 
 Personalizza la sola schermata di accesso a wp-admin con lo stile del sito su cui è installato
@@ -25,9 +25,8 @@ Prima dell'analisi il plugin parte da: logo personalizzato → logo Elementor �
 e dai colori di theme.json / kit Elementor.
 
 == Aggiornamenti ==
-Il plugin si aggiorna dalle release del repository GitHub privato di LU3G. Ogni sito ha bisogno, in wp-config.php, di:
-  define( 'LU3G_GITHUB_TOKEN', 'github_pat_...' );
-(token fine-grained limitato al repository, permesso Contents: Read-only). Senza token il plugin funziona ma non vede gli aggiornamenti.
+Il plugin si aggiorna da solo dalle release di https://github.com/sviluppolu3g/lu3g-login-brand (repository pubblico):
+le nuove versioni compaiono in Bacheca → Aggiornamenti, senza configurare nulla.
 
 == Note ==
 - Nessun file esterno: i due loghi LU3G (per fondo scuro e per fondo chiaro) sono nella cartella assets.

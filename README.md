@@ -8,11 +8,8 @@ Il resto di wp-admin non viene toccato.
 1. Scarica `lu3g-login-brand.zip` dall'ultima [release](../../releases/latest).
 2. WordPress → Plugin → Aggiungi nuovo → Carica plugin → Attiva.
 3. Impostazioni → Accesso LU3G → **Analizza il sito** → controlla i valori → Salva.
-4. Per ricevere gli aggiornamenti (repository privato) aggiungi in `wp-config.php`:
-   ```php
-   define( 'LU3G_GITHUB_TOKEN', 'github_pat_...' );
-   ```
-   Token GitHub *fine-grained*, limitato a questo repository, permesso **Contents: Read-only**.
+4. Gli aggiornamenti arrivano da soli dalle release di questo repository (Bacheca → Aggiornamenti): non serve configurare nulla.
+   Facoltativo: `define( 'LU3G_GITHUB_TOKEN', 'github_pat_...' );` in `wp-config.php` alza il limite di richieste all'API GitHub.
 
 Se sul sito c'è lo snippet WPCode "Schermata di accesso a wp-admin con logo LU3G", il plugin ha la precedenza e lo snippet
 non fa nulla: si può disattivare.

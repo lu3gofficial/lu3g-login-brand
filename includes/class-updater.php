@@ -1,6 +1,6 @@
 <?php
 /**
- * Aggiornamenti del plugin da GitHub (repository privato).
+ * Aggiornamenti del plugin da GitHub (repository pubblico sviluppolu3g/lu3g-login-brand).
  *
  * Come funziona:
  * - l'intestazione "Update URI: https://github.com/..." del plugin dice a WordPress di non cercarlo su wordpress.org
@@ -9,10 +9,10 @@
  *   WordPress mostra "Aggiornamento disponibile" come per ogni altro plugin;
  * - il pacchetto è il file "lu3g-login-brand.zip" allegato alla release (cartella lu3g-login-brand/ all'interno).
  *
- * Repository privato: ogni sito ha bisogno di un token GitHub di sola lettura in wp-config.php:
+ * Il repository è pubblico: non serve nessuna configurazione. Facoltativo: un token GitHub in wp-config.php
  *   define( 'LU3G_GITHUB_TOKEN', 'github_pat_...' );
- * (token "fine-grained" limitato a questo repository, permesso "Contents: Read-only"). Senza token il plugin funziona,
- * ma non vede gli aggiornamenti.
+ * alza il limite di richieste all'API (60 l'ora per indirizzo IP senza token; con la cache di 6 ore basta e avanza)
+ * e servirebbe di nuovo se il repository tornasse privato.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -129,8 +129,8 @@ final class LU3G_Login_Brand_Updater {
 	}
 
 	/**
-	 * Scarica il pacchetto dal repository privato. L'allegato si chiede all'API con il token; GitHub risponde con un
-	 * rinvio a un indirizzo temporaneo già firmato, che si scarica SENZA token (lì il token verrebbe rifiutato).
+	 * Scarica il pacchetto. L'allegato si chiede all'API (con il token, se c'è); GitHub risponde con un rinvio a un
+	 * indirizzo temporaneo già firmato, che si scarica SENZA token (lì un token verrebbe rifiutato).
 	 */
 	public static function download( $reply, $package, $upgrader ) {
 		if ( 0 !== strpos( (string) $package, 'https://api.github.com/repos/' . self::REPO . '/releases/assets/' ) ) {
@@ -143,7 +143,7 @@ final class LU3G_Login_Brand_Updater {
 		$code = wp_remote_retrieve_response_code( $res );
 		$to   = wp_remote_retrieve_header( $res, 'location' );
 		if ( $code < 300 || $code > 399 || ! $to ) {
-			return new WP_Error( 'lu3g_download', 'GitHub non ha fornito il pacchetto (codice ' . $code . '): controlla LU3G_GITHUB_TOKEN in wp-config.php.' );
+			return new WP_Error( 'lu3g_download', 'GitHub non ha fornito il pacchetto (codice ' . $code . '). Riprova più tardi o scarica lo zip dalla pagina delle release.' );
 		}
 		if ( ! function_exists( 'download_url' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/file.php';
