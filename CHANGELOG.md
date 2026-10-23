@@ -1,5 +1,8 @@
 # Registro delle modifiche
 
+## Non ancora rilasciato
+- "Controlla di nuovo" in Bacheca → Aggiornamenti rilegge subito GitHub (prima poteva usare la release in cache fino a 6 ore).
+
 ## 1.2.0 – 2026-10-23
 - Interazioni animate nella schermata di accesso (opzione "Animazioni" in Impostazioni → Accesso LU3G, attiva di serie):
   entrata in sequenza di riga d'accento, loghi, modulo e link; alone del colore di accento che si muove piano sullo sfondo;

@@ -33,9 +33,11 @@ final class LU3G_Login_Brand_Updater {
 		add_filter( 'update_plugins_github.com', array( __CLASS__, 'check' ), 10, 3 );
 		add_filter( 'plugins_api', array( __CLASS__, 'details' ), 20, 3 );
 		add_filter( 'upgrader_pre_download', array( __CLASS__, 'download' ), 10, 3 );
-		// dopo un aggiornamento o un controllo manuale si rilegge GitHub
+		// dopo un aggiornamento si rilegge GitHub
 		add_action( 'upgrader_process_complete', array( __CLASS__, 'flush' ) );
-		add_action( 'load-update-core.php', array( __CLASS__, 'flush' ) );
+		// "Controlla di nuovo" (update-core.php?force-check=1): la cache va svuotata PRIMA del controllo di WordPress,
+		// che è agganciato allo stesso evento con priorità 10; con priorità 1 si passa prima
+		add_action( 'load-update-core.php', array( __CLASS__, 'flush_on_force_check' ), 1 );
 	}
 
 	private static function token() {
@@ -56,6 +58,14 @@ final class LU3G_Login_Brand_Updater {
 
 	public static function flush() {
 		delete_site_transient( self::TRANSIENT );
+	}
+
+	public static function flush_on_force_check() {
+		if ( ! empty( $_GET['force-check'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- solo lettura
+			self::flush();
+			// il controllo dei plugin di WordPress su questa pagina ripete la richiesta solo dopo 1 minuto: lo forzo
+			delete_site_transient( 'update_plugins' );
+		}
 	}
 
 	/** Ultima release pubblicata: versione, pacchetto (URL API dell'allegato), note, data. */
