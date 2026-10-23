@@ -1,5 +1,12 @@
 # Registro delle modifiche
 
+## 1.3.0 – 2026-10-23
+- Nuovo aspetto "Report LU3G" (predefinito): la schermata di https://report.lu3g.com/login riprodotta in WordPress.
+  Fondo #09090b, colonna di 390px, logo LU3G 46px, titolo in Manrope, campi scuri, occhio della password con l'icona
+  dell'app, pulsante bianco con freccia, link in una riga sotto il modulo. Font DM Sans e Manrope inclusi nel plugin (SIL OFL).
+- Titolo e testo del pulsante modificabili; per le altre pagine (password dimenticata, nuova password) titolo automatico.
+- L'aspetto precedente resta disponibile: Impostazioni → Accesso LU3G → Aspetto → "Colori del sito".
+
 ## 1.2.1 – 2026-10-23
 - "Controlla di nuovo" in Bacheca → Aggiornamenti rilegge subito GitHub (prima poteva usare la release in cache fino a 6 ore).
 

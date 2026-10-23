@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       LU3G Login Brand
  * Description:       Personalizza la schermata di accesso a wp-admin con logo, colori e font del sito, affiancando il logo LU3G. Il pulsante "Analizza il sito" legge lo stile della homepage; i valori si possono poi ritoccare.
- * Version:           1.2.1
+ * Version:           1.3.0
  * Author:            LU3G
  * Author URI:        https://lu3g.it/
  * Plugin URI:        https://github.com/sviluppolu3g/lu3g-login-brand
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class LU3G_Login_Brand {
 
 	const OPT     = 'lu3g_login_brand';
-	const VERSION = '1.2.1';
+	const VERSION = '1.3.0';
 
 	public static function init() {
 		// schermata di accesso (il resto di wp-admin resta com'è)
@@ -28,6 +28,8 @@ final class LU3G_Login_Brand {
 		add_filter( 'login_headerurl', array( __CLASS__, 'header_url' ) );
 		add_filter( 'login_headertext', array( __CLASS__, 'header_text' ) );
 		add_action( 'login_footer', array( __CLASS__, 'login_footer' ) );
+		add_filter( 'login_message', array( __CLASS__, 'login_message' ) );
+		add_filter( 'login_display_language_dropdown', array( __CLASS__, 'language_dropdown' ) );
 
 		// impostazioni: Impostazioni → Accesso LU3G
 		add_action( 'admin_menu', array( __CLASS__, 'admin_menu' ) );
@@ -89,6 +91,9 @@ final class LU3G_Login_Brand {
 			'lu3g'      => 1,
 			'signature' => 1,
 			'motion'    => 1,          // interazioni animate (entrata, alone, pulsante, campi)
+			'layout'    => 'report',   // aspetto: report = come report.lu3g.com/login; sito = colori e logo del sito
+			'title'     => 'Accedi al sito',
+			'button'    => 'Accedi al pannello',
 			'analyzed'  => '',
 		);
 	}
@@ -157,6 +162,9 @@ final class LU3G_Login_Brand {
 		$out['lu3g']      = empty( $in['lu3g'] ) ? 0 : 1;
 		$out['signature'] = empty( $in['signature'] ) ? 0 : 1;
 		$out['motion']    = empty( $in['motion'] ) ? 0 : 1;
+		$out['layout']    = ( 'sito' === ( $in['layout'] ?? '' ) ) ? 'sito' : 'report';
+		$out['title']     = substr( sanitize_text_field( $in['title'] ?? '' ), 0, 80 );
+		$out['button']    = substr( sanitize_text_field( $in['button'] ?? '' ), 0, 60 );
 		$out['analyzed']  = sanitize_text_field( $in['analyzed'] ?? '' );
 		return $out;
 	}
@@ -222,11 +230,32 @@ final class LU3G_Login_Brand {
 
 	public static function header_text() {
 		$o = self::get();
+		if ( 'report' === $o['layout'] ) {
+			return 'LU3G';
+		}
 		return get_bloginfo( 'name' ) . ( $o['lu3g'] ? ' · sito realizzato da LU3G' : '' );
+	}
+
+	/** Aspetto "Report LU3G": titolo sopra il modulo (il filtro login_message lo stampa tra il logo e il modulo). */
+	public static function login_message( $message ) {
+		$o = self::get();
+		if ( 'report' !== $o['layout'] ) {
+			return $message;
+		}
+		return '<h2 class="lu3g-titolo">' . esc_html( LU3G_Login_Report::title( $o ) ) . '</h2>' . $message;
+	}
+
+	/** Aspetto "Report LU3G": niente scelta della lingua sotto il modulo (come nell'app). */
+	public static function language_dropdown( $show ) {
+		return 'report' === self::get()['layout'] ? false : $show;
 	}
 
 	public static function login_footer() {
 		$o = self::get();
+		if ( 'report' === $o['layout'] ) {
+			LU3G_Login_Report::footer( $o );
+			return;
+		}
 		if ( $o['lu3g'] && $o['signature'] ) {
 			echo '<p class="lu3g-firma">Sito realizzato da <a href="https://lu3g.it/" target="_blank" rel="noopener">LU3G</a></p>';
 		}
@@ -239,6 +268,10 @@ final class LU3G_Login_Brand {
 
 	public static function login_styles() {
 		$o = self::get();
+		if ( 'report' === $o['layout'] ) {
+			echo '<style id="lu3g-login-brand">' . LU3G_Login_Report::css( $o, __FILE__, self::lu3g_logo( 'light' ) ) . '</style>' . "\n";
+			return;
+		}
 		foreach ( $o['font_css'] as $i => $url ) {
 			wp_enqueue_style( 'lu3g-login-font-' . $i, $url, array(), null );
 		}
@@ -411,6 +444,17 @@ final class LU3G_Login_Brand {
 				<?php settings_fields( 'lu3g_login_brand' ); ?>
 				<table class="form-table" role="presentation">
 					<tr>
+						<th scope="row">Aspetto</th>
+						<td><label><input type="radio" name="<?php echo esc_attr( $n ); ?>[layout]" value="report" <?php checked( $o['layout'], 'report' ); ?>> Report LU3G: scuro e minimale, come report.lu3g.com</label><br>
+							<label><input type="radio" name="<?php echo esc_attr( $n ); ?>[layout]" value="sito" <?php checked( $o['layout'], 'sito' ); ?>> Colori del sito: logo del sito accanto al logo LU3G, colori e font letti con "Analizza il sito"</label></td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="lu3g-title">Titolo e pulsante</label></th>
+						<td><input type="text" class="regular-text" id="lu3g-title" name="<?php echo esc_attr( $n ); ?>[title]" value="<?php echo esc_attr( $o['title'] ); ?>" placeholder="Accedi al sito"><br>
+							<input type="text" class="regular-text" id="lu3g-button" name="<?php echo esc_attr( $n ); ?>[button]" value="<?php echo esc_attr( $o['button'] ); ?>" placeholder="Accedi al pannello" style="margin-top:6px">
+							<p class="description">Solo per l'aspetto "Report LU3G": titolo sopra il modulo e testo del pulsante.</p></td>
+					</tr>
+					<tr>
 						<th scope="row"><label for="lu3g-logo">Logo del sito</label></th>
 						<td>
 							<input type="text" class="large-text code" id="lu3g-logo" name="<?php echo esc_attr( $n ); ?>[logo]" value="<?php echo esc_attr( $o['logo'] ); ?>">
@@ -459,5 +503,6 @@ final class LU3G_Login_Brand {
 LU3G_Login_Brand::init();
 
 // aggiornamenti dalle release GitHub (vedi includes/class-updater.php)
+require_once __DIR__ . '/includes/class-layout-report.php';
 require_once __DIR__ . '/includes/class-updater.php';
 LU3G_Login_Brand_Updater::init( __FILE__ );

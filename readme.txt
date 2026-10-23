@@ -1,5 +1,5 @@
 === LU3G Login Brand ===
-Versione: 1.2.1
+Versione: 1.3.0
 Richiede: WordPress 6.0+, PHP 7.4+
 
 Personalizza la sola schermata di accesso a wp-admin con lo stile del sito su cui è installato
@@ -27,6 +27,9 @@ e dai colori di theme.json / kit Elementor.
 == Aggiornamenti ==
 Il plugin si aggiorna da solo dalle release di https://github.com/sviluppolu3g/lu3g-login-brand (repository pubblico):
 le nuove versioni compaiono in Bacheca → Aggiornamenti, senza configurare nulla.
+
+== Font ==
+DM Sans e Manrope (assets/fonts) sono distribuiti con licenza SIL Open Font License 1.1.
 
 == Note ==
 - Nessun file esterno: i due loghi LU3G (per fondo scuro e per fondo chiaro) sono nella cartella assets.
