@@ -1,5 +1,10 @@
 # Registro delle modifiche
 
+## 1.7.1 – 2026-10-27
+- Aggiornamenti indipendenti dal proprietario del repository GitHub: senza token il pacchetto è il link pubblico di
+  download (WordPress lo scarica da solo), con il token l'indirizzo API dell'allegato è riconosciuto qualunque sia il
+  proprietario. Così uno spostamento del repository non blocca più "Aggiorna adesso" (con la 1.6.0 succedeva).
+
 ## 1.7.0 – 2026-10-27
 - L'aspetto "Report LU3G" si chiama ora **Tema LU3G** (il valore salvato resta lo stesso: nessuna impostazione da rifare).
 - Nuova scheda **Bacheca** (spenta di serie): i colori dell'aspetto scelto in tutta la bacheca di WordPress – menu laterale,

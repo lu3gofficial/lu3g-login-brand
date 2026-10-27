@@ -9,6 +9,13 @@
  *   WordPress mostra "Aggiornamento disponibile" come per ogni altro plugin;
  * - il pacchetto è il file "lu3g-login-brand.zip" allegato alla release (cartella lu3g-login-brand/ all'interno).
  *
+ * Se il repository cambia proprietario o nome (come nel passaggio da sviluppolu3g a lu3gofficial, 1.7.1):
+ * - GitHub rinvia il vecchio indirizzo al nuovo e wp_remote_get segue il rinvio, quindi il controllo trova la release;
+ * - senza token il pacchetto è il link pubblico di download dell'allegato (github.com/.../releases/download/...),
+ *   che WordPress scarica da solo senza passare da questo file;
+ * - con il token il pacchetto è l'indirizzo API dell'allegato, riconosciuto qualunque sia il proprietario
+ *   (repos/<chiunque>/lu3g-login-brand/... oppure repositories/<numero>/...).
+ *
  * Il repository è pubblico: non serve nessuna configurazione. Facoltativo: un token GitHub in wp-config.php
  *   define( 'LU3G_GITHUB_TOKEN', 'github_pat_...' );
  * alza il limite di richieste all'API (60 l'ora per indirizzo IP senza token; con la cache di 6 ore basta e avanza)
@@ -21,7 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class LU3G_Login_Brand_Updater {
 
-	const REPO      = 'lu3gofficial/lu3g-login-brand';   // proprietario/nome del repository su GitHub
+	const REPO      = 'lu3gofficial/lu3g-login-brand';   // proprietario/nome del repository su GitHub (se cambia, GitHub rinvia)
 	const ASSET     = 'lu3g-login-brand.zip';
 	const SLUG      = 'lu3g-login-brand';
 	const TRANSIENT = 'lu3g_login_brand_release';
@@ -80,9 +87,11 @@ final class LU3G_Login_Brand_Updater {
 			$json = json_decode( wp_remote_retrieve_body( $res ), true );
 			foreach ( (array) ( $json['assets'] ?? array() ) as $a ) {
 				if ( self::ASSET === ( $a['name'] ?? '' ) ) {
-					$data = array(
+					// senza token: link pubblico, scaricabile da WordPress senza intestazioni speciali
+					$public = (string) ( $a['browser_download_url'] ?? '' );
+					$data   = array(
 						'version'   => ltrim( (string) $json['tag_name'], 'vV' ),
-						'package'   => $a['url'],
+						'package'   => ( self::token() || ! $public ) ? $a['url'] : $public,
 						'notes'     => (string) ( $json['body'] ?? '' ),
 						'date'      => (string) ( $json['published_at'] ?? '' ),
 						'html_url'  => (string) ( $json['html_url'] ?? '' ),
@@ -138,12 +147,18 @@ final class LU3G_Login_Brand_Updater {
 		);
 	}
 
+	/** Indirizzo API di un allegato di questo plugin, qualunque sia il proprietario del repository. */
+	private static function is_asset_url( $url ) {
+		$name = preg_quote( substr( self::REPO, strpos( self::REPO, '/' ) + 1 ), '#' );
+		return (bool) preg_match( '#^https://api\.github\.com/(repos/[A-Za-z0-9_.-]+/' . $name . '|repositories/\d+)/releases/assets/\d+$#', (string) $url );
+	}
+
 	/**
 	 * Scarica il pacchetto. L'allegato si chiede all'API (con il token, se c'è); GitHub risponde con un rinvio a un
 	 * indirizzo temporaneo già firmato, che si scarica SENZA token (lì un token verrebbe rifiutato).
 	 */
 	public static function download( $reply, $package, $upgrader ) {
-		if ( 0 !== strpos( (string) $package, 'https://api.github.com/repos/' . self::REPO . '/releases/assets/' ) ) {
+		if ( ! self::is_asset_url( $package ) ) {
 			return $reply;
 		}
 		$res = wp_remote_get( $package, array( 'headers' => self::headers( 'application/octet-stream' ), 'redirection' => 0, 'timeout' => 15 ) );
