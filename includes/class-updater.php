@@ -1,6 +1,6 @@
 <?php
 /**
- * Aggiornamenti del plugin da GitHub (repository pubblico sviluppolu3g/lu3g-login-brand).
+ * Aggiornamenti del plugin da GitHub (repository pubblico lu3gofficial/lu3g-login-brand).
  *
  * Come funziona:
  * - l'intestazione "Update URI: https://github.com/..." del plugin dice a WordPress di non cercarlo su wordpress.org
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class LU3G_Login_Brand_Updater {
 
-	const REPO      = 'sviluppolu3g/lu3g-login-brand';   // proprietario/nome del repository su GitHub
+	const REPO      = 'lu3gofficial/lu3g-login-brand';   // proprietario/nome del repository su GitHub
 	const ASSET     = 'lu3g-login-brand.zip';
 	const SLUG      = 'lu3g-login-brand';
 	const TRANSIENT = 'lu3g_login_brand_release';

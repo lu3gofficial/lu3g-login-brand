@@ -1,5 +1,10 @@
 # Registro delle modifiche
 
+## 1.6.1 – 2026-10-27
+- Il repository è passato all'organizzazione GitHub lu3gofficial: aggiornati Plugin URI, Update URI e sorgente
+  degli aggiornamenti (lu3gofficial/lu3g-login-brand). I siti con versioni precedenti si aggiornano comunque,
+  perché GitHub reindirizza il vecchio indirizzo.
+
 ## 1.6.0 – 2026-10-23
 - Schermata di caricamento dopo l'accesso: sei animazioni a scelta (Linea, Dissolvenza, Pulsazione, Anello, Sipario,
   Cerchio), ognuna con una miniatura animata nelle impostazioni e il pulsante "Prova a schermo intero".
