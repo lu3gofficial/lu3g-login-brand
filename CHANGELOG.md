@@ -1,5 +1,9 @@
 # Registro delle modifiche
 
+## 1.7.3 – 2026-10-27
+- Pagina Plugin: link "Controlla aggiornamenti" nella riga del plugin, porta a Bacheca → Aggiornamenti e rilegge subito
+  GitHub (senza aspettare le 6 ore della cache).
+
 ## 1.7.2 – 2026-10-27
 - Pagina delle impostazioni: link "Novità" accanto alla versione, porta alle note delle release su GitHub.
 - Prima versione ricevuta in automatico dai siti passati a mano alla 1.7.1 (prova degli aggiornamenti da lu3gofficial).

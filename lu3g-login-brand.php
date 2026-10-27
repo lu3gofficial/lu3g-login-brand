@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       LU3G Login Brand
  * Description:       Personalizza la schermata di accesso a wp-admin con logo, colori e font del sito, affiancando il logo LU3G. Il pulsante "Analizza il sito" legge lo stile della homepage; i valori si possono poi ritoccare. Facoltativo: gli stessi colori in tutta la bacheca.
- * Version:           1.7.2
+ * Version:           1.7.3
  * Author:            LU3G
  * Author URI:        https://lu3g.it/
  * Plugin URI:        https://github.com/lu3gofficial/lu3g-login-brand
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class LU3G_Login_Brand {
 
 	const OPT     = 'lu3g_login_brand';
-	const VERSION = '1.7.2';
+	const VERSION = '1.7.3';
 
 	public static function init() {
 		// schermata di accesso
@@ -499,6 +499,10 @@ final class LU3G_Login_Brand {
 
 	public static function action_links( $links ) {
 		array_unshift( $links, '<a href="' . esc_url( admin_url( 'options-general.php?page=lu3g-login-brand' ) ) . '">Impostazioni</a>' );
+		// rilegge subito GitHub (Bacheca → Aggiornamenti → "Controlla di nuovo"), senza aspettare le 6 ore della cache
+		if ( current_user_can( 'update_plugins' ) ) {
+			$links[] = '<a href="' . esc_url( self_admin_url( 'update-core.php?force-check=1' ) ) . '">Controlla aggiornamenti</a>';
+		}
 		return $links;
 	}
 
