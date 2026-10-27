@@ -2,9 +2,10 @@
 /**
  * Pagina delle impostazioni (Impostazioni → Accesso LU3G).
  *
- * Struttura: intestazione scura con il logo LU3G; a sinistra le schede delle impostazioni (Aspetto, Testi, Font,
- * Colori e logo del sito, Effetti, Firma LU3G); a destra l'anteprima della schermata di accesso, che si aggiorna mentre
- * si cambia qualcosa (assets/admin-ui.js); in basso la barra con "Salva".
+ * Struttura: intestazione scura con il logo LU3G e la barra delle sezioni (porta alla scheda, si accende quella che si
+ * sta guardando); a sinistra le schede delle impostazioni (Aspetto, Testi, Font, Colori e logo del sito, Effetti,
+ * Bacheca, Firma LU3G); a destra l'anteprima della schermata di accesso, che si aggiorna mentre si cambia qualcosa e
+ * può rivedere l'animazione d'entrata (assets/admin-ui.js); in basso la barra con "Salva".
  * Gli ID dei campi di "Analizza il sito" (lu3g-logo, lu3g-bg, lu3g-accent, lu3g-font, lu3g-font-css, lu3g-analyzed...)
  * sono gli stessi di prima: li usa assets/admin.js.
  */
@@ -68,22 +69,31 @@ final class LU3G_Login_Admin {
 				<img src="<?php echo esc_attr( LU3G_Login_Brand::lu3g_logo( 'light' ) ); ?>" alt="" width="34" height="34">
 				<div>
 					<p class="lu3g-head__title">Accesso LU3G</p>
-					<p class="lu3g-head__sub">Schermata di accesso a wp-admin · versione <?php echo esc_html( $version ); ?></p>
+					<p class="lu3g-head__sub">Schermata di accesso e bacheca di WordPress · versione <?php echo esc_html( $version ); ?></p>
 				</div>
 				<a class="lu3g-btn lu3g-btn--ghost" href="<?php echo esc_url( wp_login_url() ); ?>" target="_blank" rel="noopener">Apri la schermata di accesso ↗</a>
 			</header>
+			<nav class="lu3g-nav" aria-label="Sezioni">
+				<a href="#lu3g-s-aspetto">Aspetto</a>
+				<a href="#lu3g-s-testi" class="lu3g-only-report">Testi</a>
+				<a href="#lu3g-s-font">Font</a>
+				<a href="#lu3g-s-sito" class="lu3g-only-sito">Colori e logo</a>
+				<a href="#lu3g-s-effetti">Effetti</a>
+				<a href="#lu3g-s-bacheca">Bacheca</a>
+				<a href="#lu3g-s-firma" class="lu3g-only-sito">Firma LU3G</a>
+			</nav>
 
 			<form method="post" action="options.php" class="lu3g-grid" id="lu3g-form">
 				<?php settings_fields( 'lu3g_login_brand' ); ?>
 				<div class="lu3g-col">
 
-					<section class="lu3g-card">
+					<section class="lu3g-card" id="lu3g-s-aspetto">
 						<h2>Aspetto</h2>
 						<div class="lu3g-tiles" role="radiogroup" aria-label="Aspetto">
 							<label class="lu3g-tile">
 								<input type="radio" name="<?php echo esc_attr( $n ); ?>[layout]" value="report" <?php checked( $o['layout'], 'report' ); ?>>
 								<span class="lu3g-tile__thumb lu3g-tile__thumb--report" aria-hidden="true"><i></i><b></b><b></b><em></em></span>
-								<strong>Report LU3G</strong><small>Scuro e minimale, come report.lu3g.com</small>
+								<strong>Tema LU3G</strong><small>Scuro e minimale, lo stile di report.lu3g.com</small>
 							</label>
 							<label class="lu3g-tile">
 								<input type="radio" name="<?php echo esc_attr( $n ); ?>[layout]" value="sito" <?php checked( $o['layout'], 'sito' ); ?>>
@@ -93,7 +103,7 @@ final class LU3G_Login_Admin {
 						</div>
 					</section>
 
-					<section class="lu3g-card lu3g-only-report">
+					<section class="lu3g-card lu3g-only-report" id="lu3g-s-testi">
 						<h2>Testi</h2>
 						<div class="lu3g-row">
 							<div><label class="lu3g-label" for="lu3g-title">Titolo</label>
@@ -103,7 +113,7 @@ final class LU3G_Login_Admin {
 						</div>
 					</section>
 
-					<section class="lu3g-card">
+					<section class="lu3g-card" id="lu3g-s-font">
 						<h2>Font</h2>
 						<p class="lu3g-hint">Tutti i Google Fonts. Al salvataggio il font scelto viene scaricato sul sito: la pagina di accesso non contatta Google.</p>
 						<div class="lu3g-chips" role="group" aria-label="Filtra per categoria">
@@ -120,7 +130,7 @@ final class LU3G_Login_Admin {
 						</div>
 					</section>
 
-					<section class="lu3g-card lu3g-only-sito">
+					<section class="lu3g-card lu3g-only-sito" id="lu3g-s-sito">
 						<h2>Colori e logo del sito</h2>
 						<div class="lu3g-analyze">
 							<button type="button" class="lu3g-btn" id="lu3g-analyze">Analizza il sito</button>
@@ -146,9 +156,22 @@ final class LU3G_Login_Admin {
 						<textarea hidden id="lu3g-font-css" name="<?php echo esc_attr( $n ); ?>[font_css]"><?php echo esc_textarea( implode( "\n", $o['font_css'] ) ); ?></textarea>
 					</section>
 
-					<section class="lu3g-card">
+					<section class="lu3g-card" id="lu3g-s-effetti">
 						<h2>Effetti</h2>
-						<?php self::toggle( $n, 'motion', $o, 'Animazioni', 'Entrata in sequenza di logo, titolo e modulo; pulsante e campi animati. Spente per chi ha "riduci animazioni".' ); ?>
+						<?php self::toggle( $n, 'motion', $o, 'Animazioni', 'Entrata in sequenza di logo, titolo e modulo; pulsante, campi e messaggi animati. Spente per chi ha "riduci animazioni".' ); ?>
+						<div class="lu3g-anims lu3g-entries" id="lu3g-entries">
+							<p class="lu3g-label">Entrata della schermata di accesso</p>
+							<div class="lu3g-anims__grid lu3g-entries__grid" role="radiogroup" aria-label="Entrata della schermata di accesso">
+								<?php foreach ( LU3G_Login_Brand::entry_styles() as $key => $info ) : ?>
+									<label class="lu3g-anim lu3g-entry lu3g-entry--<?php echo esc_attr( $key ); ?>" title="<?php echo esc_attr( $info[1] ); ?>">
+										<input type="radio" name="<?php echo esc_attr( $n ); ?>[motion_style]" value="<?php echo esc_attr( $key ); ?>" <?php checked( $o['motion_style'], $key ); ?>>
+										<span class="lu3g-anim__stage lu3g-entry__stage" aria-hidden="true"><i></i><b></b><b></b><em></em></span>
+										<strong><?php echo esc_html( $info[0] ); ?></strong>
+										<small><?php echo esc_html( $info[1] ); ?></small>
+									</label>
+								<?php endforeach; ?>
+							</div>
+						</div>
 						<?php self::toggle( $n, 'splash', $o, 'Schermata di caricamento dopo l\'accesso', 'Una volta, sulla prima pagina dopo il login, per circa 1,5 secondi; la pagina si carica intanto sotto.' ); ?>
 						<div class="lu3g-anims" id="lu3g-anims">
 							<p class="lu3g-label">Animazione</p>
@@ -166,7 +189,20 @@ final class LU3G_Login_Admin {
 						</div>
 					</section>
 
-					<section class="lu3g-card lu3g-only-sito">
+					<section class="lu3g-card" id="lu3g-s-bacheca">
+						<h2>Bacheca</h2>
+						<?php self::toggle( $n, 'dashboard', $o, 'Colori in tutta la bacheca', 'Menu laterale, barra in alto (anche sul sito), pulsanti, link e campi con i colori dell\'aspetto scelto: Tema LU3G o colori del sito. Le pagine restano chiare.' ); ?>
+						<div class="lu3g-dashbox" id="lu3g-dashbox">
+							<div class="lu3g-dash" id="lu3g-dash" aria-hidden="true">
+								<span class="lu3g-dash__bar"><i></i><i></i><i></i></span>
+								<span class="lu3g-dash__menu"><i></i><i class="is-on"></i><i></i><i></i><i></i></span>
+								<span class="lu3g-dash__page"><b></b><b></b><b></b><em></em></span>
+							</div>
+							<?php self::toggle( $n, 'dashboard_motion', $o, 'Animazioni nella bacheca', 'Pagine che entrano, sottomenu e menu della barra che compaiono, pulsanti con pressione al clic. Mai nell\'editor a blocchi.' ); ?>
+						</div>
+					</section>
+
+					<section class="lu3g-card lu3g-only-sito" id="lu3g-s-firma">
 						<h2>Firma LU3G</h2>
 						<?php self::toggle( $n, 'lu3g', $o, 'Logo LU3G', 'Accanto al logo del sito, separato da una riga sottile.' ); ?>
 						<?php self::toggle( $n, 'signature', $o, '"Sito realizzato da LU3G"', 'In fondo alla pagina di accesso.' ); ?>
@@ -175,7 +211,8 @@ final class LU3G_Login_Admin {
 				</div>
 
 				<aside class="lu3g-preview" aria-label="Anteprima">
-					<div class="lu3g-preview__bar"><span></span><span></span><span></span><em>Anteprima</em></div>
+					<div class="lu3g-preview__bar"><span></span><span></span><span></span><em>Anteprima</em>
+						<button type="button" class="lu3g-replay" id="lu3g-replay">↻ Rivedi l'entrata</button></div>
 					<div class="lu3g-pv" id="lu3g-pv">
 						<div class="lu3g-pv__inner">
 							<div class="lu3g-pv__logos"><span class="lu3g-pv__site"></span><span class="lu3g-pv__lu3g"></span></div>

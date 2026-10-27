@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name:       LU3G Login Brand
- * Description:       Personalizza la schermata di accesso a wp-admin con logo, colori e font del sito, affiancando il logo LU3G. Il pulsante "Analizza il sito" legge lo stile della homepage; i valori si possono poi ritoccare.
- * Version:           1.6.1
+ * Description:       Personalizza la schermata di accesso a wp-admin con logo, colori e font del sito, affiancando il logo LU3G. Il pulsante "Analizza il sito" legge lo stile della homepage; i valori si possono poi ritoccare. Facoltativo: gli stessi colori in tutta la bacheca.
+ * Version:           1.7.0
  * Author:            LU3G
  * Author URI:        https://lu3g.it/
  * Plugin URI:        https://github.com/lu3gofficial/lu3g-login-brand
@@ -20,10 +20,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class LU3G_Login_Brand {
 
 	const OPT     = 'lu3g_login_brand';
-	const VERSION = '1.6.1';
+	const VERSION = '1.7.0';
 
 	public static function init() {
-		// schermata di accesso (il resto di wp-admin resta com'è)
+		// schermata di accesso
 		add_action( 'login_enqueue_scripts', array( __CLASS__, 'login_styles' ) );
 		add_filter( 'login_headerurl', array( __CLASS__, 'header_url' ) );
 		add_filter( 'login_headertext', array( __CLASS__, 'header_text' ) );
@@ -91,11 +91,14 @@ final class LU3G_Login_Brand {
 			'lu3g'      => 1,
 			'signature' => 1,
 			'motion'    => 1,          // interazioni animate (entrata, alone, pulsante, campi)
+		'motion_style' => 'sale',  // entrata della schermata di accesso (vedi self::entry_styles())
+		'dashboard' => 0,          // colori del tema anche in tutta la bacheca di WordPress (spento di serie)
+		'dashboard_motion' => 1,   // piccole animazioni nella bacheca (solo con 'dashboard' attivo)
 			'splash'    => 1,          // schermata di caricamento dopo l'accesso
 			'splash_style' => 'linea', // animazione della schermata (vedi LU3G_Login_Splash::styles())
 			'font_head' => '',         // Google Font dei titoli ('' = predefinito: Manrope o font del sito)
 			'font_body' => '',         // Google Font di testi, campi e pulsante ('' = DM Sans o font del sito)
-			'layout'    => 'report',   // aspetto: report = come report.lu3g.com/login; sito = colori e logo del sito
+			'layout'    => 'report',   // aspetto: report = "Tema LU3G" (come report.lu3g.com/login); sito = colori e logo del sito
 			'title'     => 'Accedi al sito',
 			'button'    => 'Accedi al pannello',
 			'analyzed'  => '',
@@ -166,6 +169,10 @@ final class LU3G_Login_Brand {
 		$out['lu3g']      = empty( $in['lu3g'] ) ? 0 : 1;
 		$out['signature'] = empty( $in['signature'] ) ? 0 : 1;
 		$out['motion']    = empty( $in['motion'] ) ? 0 : 1;
+		$entry               = sanitize_key( $in['motion_style'] ?? '' );
+		$out['motion_style'] = isset( self::entry_styles()[ $entry ] ) ? $entry : 'sale';
+		$out['dashboard']        = empty( $in['dashboard'] ) ? 0 : 1;
+		$out['dashboard_motion'] = empty( $in['dashboard_motion'] ) ? 0 : 1;
 		$out['splash']    = empty( $in['splash'] ) ? 0 : 1;
 		$style               = sanitize_key( $in['splash_style'] ?? '' );
 		$out['splash_style'] = isset( LU3G_Login_Splash::styles()[ $style ] ) ? $style : 'linea';
@@ -203,7 +210,7 @@ final class LU3G_Login_Brand {
 
 	/* ---------------------------------------------------------------- colori */
 
-	private static function rgb( $hex ) {
+	public static function rgb( $hex ) {
 		$hex = ltrim( $hex, '#' );
 		if ( 3 === strlen( $hex ) ) {
 			$hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
@@ -238,15 +245,73 @@ final class LU3G_Login_Brand {
 	}
 
 	/** Mescola due colori: $t = quanto del secondo. */
-	private static function mix( $a, $b, $t ) {
+	public static function mix( $a, $b, $t ) {
 		$a = self::rgb( $a );
 		$b = self::rgb( $b );
 		return self::hex( array( $a[0] + ( $b[0] - $a[0] ) * $t, $a[1] + ( $b[1] - $a[1] ) * $t, $a[2] + ( $b[2] - $a[2] ) * $t ) );
 	}
 
-	private static function rgba( $hex, $alpha ) {
+	public static function rgba( $hex, $alpha ) {
 		$c = self::rgb( $hex );
 		return 'rgba(' . $c[0] . ',' . $c[1] . ',' . $c[2] . ',' . $alpha . ')';
+	}
+
+	/** Contrasto WCAG tra due colori (1 = nessuno, 21 = nero su bianco). */
+	public static function contrast( $a, $b ) {
+		$la = self::luminance( $a ) + 0.05;
+		$lb = self::luminance( $b ) + 0.05;
+		return max( $la, $lb ) / min( $la, $lb );
+	}
+
+	/** Scurisce (o schiarisce) un colore finché raggiunge il contrasto $min sul fondo $on: per link e testi sempre leggibili. */
+	public static function readable( $color, $on = '#ffffff', $min = 4.5 ) {
+		$to = self::luminance( $on ) > 0.5 ? '#000000' : '#ffffff';
+		for ( $t = 0; $t <= 1; $t += 0.1 ) {
+			$c = self::mix( $color, $to, $t );
+			if ( self::contrast( $c, $on ) >= $min ) {
+				return $c;
+			}
+		}
+		return $to;
+	}
+
+	/* ---------------------------------------------------------------- animazione d'entrata */
+
+	/** Entrate disponibili per la schermata di accesso: chiave => [nome, descrizione]. */
+	public static function entry_styles() {
+		return array(
+			'sale'      => array( 'Sale', 'Logo, titolo e modulo salgono in sequenza. La classica.' ),
+			'zoom'      => array( 'Zoom', 'Gli elementi crescono appena mentre compaiono.' ),
+			'sfocatura' => array( 'Sfocatura', 'Gli elementi passano da sfocati a nitidi.' ),
+			'cascata'   => array( 'Cascata', 'Ogni campo del modulo arriva uno dopo l\'altro.' ),
+		);
+	}
+
+	/**
+	 * Keyframe "lu3g-e" dell'entrata scelta (usato da entrambi gli aspetti). Con "cascata" anche le righe del modulo
+	 * (campi, Ricordami, pulsante) entrano una alla volta. Va sempre dentro prefers-reduced-motion: no-preference.
+	 */
+	public static function entry_css( array $o ) {
+		$style = isset( self::entry_styles()[ $o['motion_style'] ?? '' ] ) ? $o['motion_style'] : 'sale';
+		$from  = array(
+			'sale'      => 'opacity:0;transform:translateY(16px)',
+			'zoom'      => 'opacity:0;transform:scale(.94)',
+			'sfocatura' => 'opacity:0;filter:blur(10px);transform:translateY(4px)',
+			'cascata'   => 'opacity:0;transform:translateY(12px)',
+		);
+		$css = '@keyframes lu3g-e{from{' . $from[ $style ] . '}to{opacity:1;transform:none;filter:none}}';
+		if ( 'cascata' === $style ) {
+			$css .= 'body.login form>*{animation:lu3g-e .6s cubic-bezier(.22,1,.36,1) backwards}';
+			for ( $i = 1; $i <= 6; $i++ ) {
+				$css .= 'body.login form>*:nth-child(' . $i . '){animation-delay:' . ( 0.25 + 0.08 * $i ) . 's}';
+			}
+		}
+		// messaggi ed errori: scendono dall'alto (e l'errore trema appena, come conferma visiva)
+		$css .= '@keyframes lu3g-msg{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}';
+		$css .= '@keyframes lu3g-nudge{0%,100%{transform:none}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}';
+		$css .= 'body.login .message,body.login .notice,body.login .success{animation:lu3g-msg .45s cubic-bezier(.22,1,.36,1) .2s backwards}';
+		$css .= 'body.login #login_error{animation:lu3g-msg .4s cubic-bezier(.22,1,.36,1) backwards,lu3g-nudge .35s ease .4s}';
+		return $css;
 	}
 
 	/* ---------------------------------------------------------------- schermata di accesso */
@@ -263,7 +328,7 @@ final class LU3G_Login_Brand {
 		return get_bloginfo( 'name' ) . ( $o['lu3g'] ? ' · sito realizzato da LU3G' : '' );
 	}
 
-	/** Aspetto "Report LU3G": titolo sopra il modulo (il filtro login_message lo stampa tra il logo e il modulo). */
+	/** Aspetto "Tema LU3G": titolo sopra il modulo (il filtro login_message lo stampa tra il logo e il modulo). */
 	public static function login_message( $message ) {
 		$o = self::get();
 		if ( 'report' !== $o['layout'] ) {
@@ -272,7 +337,7 @@ final class LU3G_Login_Brand {
 		return '<h2 class="lu3g-titolo">' . esc_html( LU3G_Login_Report::title( $o ) ) . '</h2>' . $message;
 	}
 
-	/** Aspetto "Report LU3G": niente scelta della lingua sotto il modulo (come nell'app). */
+	/** Aspetto "Tema LU3G": niente scelta della lingua sotto il modulo (come nell'app). */
 	public static function language_dropdown( $show ) {
 		return 'report' === self::get()['layout'] ? false : $show;
 	}
@@ -372,7 +437,7 @@ final class LU3G_Login_Brand {
 		$css .= "body.login .lu3g-firma a:hover{color:{$accent}}";
 		$css .= '@media (max-width:400px){body.login #login{width:320px;padding-top:5vh}body.login #login h1 a::before{flex-basis:120px}}';
 		if ( ! empty( $o['motion'] ) ) {
-			$css .= self::motion_css( $bg, $accent, $panel );
+			$css .= self::motion_css( $o, $bg, $accent, $panel );
 		}
 		return $css;
 	}
@@ -381,18 +446,20 @@ final class LU3G_Login_Brand {
 	 * Interazioni animate della schermata di accesso (opzione "Animazioni", attiva di serie).
 	 * Tutto è dentro prefers-reduced-motion: no-preference, quindi chi ha "riduci animazioni" nel sistema operativo
 	 * vede la pagina ferma. Solo transform e opacity (GPU), niente JavaScript.
-	 * - entrata in sequenza: riga d'accento in alto, logo del sito, logo LU3G con la riga divisoria, modulo, link sotto
+	 * - entrata in sequenza (Sale, Zoom, Sfocatura o Cascata, vedi entry_css()): riga d'accento in alto, logo del sito,
+	 *   logo LU3G con la riga divisoria, modulo, link sotto
 	 *   ("backwards": finita l'entrata valgono di nuovo gli stili normali, così funziona il sollevamento all'hover);
 	 * - alone del colore di accento che si muove piano dietro il modulo;
 	 * - pulsante "Accedi": il colore scorre da sinistra all'hover (come i pulsanti dei siti LU3G), piccola pressione al clic;
 	 * - campi: bordo d'accento che si accende e leggero sollevamento quando ci si scrive;
-	 * - loghi: si sollevano appena al passaggio del mouse.
+	 * - loghi: si sollevano appena al passaggio del mouse;
+	 * - messaggi ed errori: scendono dall'alto, l'errore con un piccolo scatto laterale.
 	 */
-	private static function motion_css( $bg, $accent, $panel ) {
+	private static function motion_css( array $o, $bg, $accent, $panel ) {
 		$glow = self::rgba( $accent, '.20' );
 		$ease = 'cubic-bezier(.22,1,.36,1)';
 		$css  = '@media (prefers-reduced-motion:no-preference){';
-		$css .= '@keyframes lu3g-in{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}';
+		$css .= self::entry_css( $o );
 		$css .= '@keyframes lu3g-fade{from{opacity:0}to{opacity:1}}';
 		$css .= '@keyframes lu3g-bar{from{transform:scaleX(0)}to{transform:scaleX(1)}}';
 		$css .= '@keyframes lu3g-glow{0%{transform:translate(-30%,-20%) scale(1)}50%{transform:translate(20%,10%) scale(1.15)}100%{transform:translate(-10%,25%) scale(.95)}}';
@@ -403,13 +470,13 @@ final class LU3G_Login_Brand {
 			. "background:radial-gradient(circle,{$glow} 0%,rgba(0,0,0,0) 62%);pointer-events:none;z-index:0;animation:lu3g-glow 22s ease-in-out infinite alternate}";
 		$css .= 'body.login #login,body.login .language-switcher,body.login .lu3g-firma{position:relative;z-index:1}';
 		// entrata in sequenza
-		$css .= "body.login #login h1 a::before{animation:lu3g-in .8s {$ease} .1s backwards;transition:transform .4s {$ease}}";
-		$css .= "body.login #login h1 a::after{animation:lu3g-in .8s {$ease} .3s backwards;transition:transform .4s {$ease}}";
+		$css .= "body.login #login h1 a::before{animation:lu3g-e .8s {$ease} .1s backwards;transition:transform .4s {$ease}}";
+		$css .= "body.login #login h1 a::after{animation:lu3g-e .8s {$ease} .3s backwards;transition:transform .4s {$ease}}";
 		$css .= "body.login #login h1 a:hover::before,body.login #login h1 a:hover::after{transform:translateY(-3px)}";
 		if ( $panel ) {
 			$css .= "body.login #login h1 a{animation:lu3g-fade .6s ease both}";
 		}
-		$css .= "body.login form{animation:lu3g-in .9s {$ease} .35s backwards}";
+		$css .= "body.login form{animation:lu3g-e .9s {$ease} .35s backwards}";
 		$css .= 'body.login #nav,body.login #backtoblog,body.login .privacy-policy-page-link,body.login .language-switcher,body.login .lu3g-firma{animation:lu3g-fade .8s ease .8s both}';
 		// campi: bordo d'accento e leggero sollevamento
 		$css .= "body.login form .input,body.login input[type=\"text\"],body.login input[type=\"password\"]{transition:border-color .3s ease,box-shadow .3s ease,background-color .3s ease,transform .3s {$ease}}";
@@ -469,5 +536,7 @@ require_once __DIR__ . '/includes/class-admin.php';
 require_once __DIR__ . '/includes/class-layout-report.php';
 require_once __DIR__ . '/includes/class-splash.php';
 LU3G_Login_Splash::init();
+require_once __DIR__ . '/includes/class-dashboard.php';
+LU3G_Login_Dashboard::init();
 require_once __DIR__ . '/includes/class-updater.php';
 LU3G_Login_Brand_Updater::init( __FILE__ );

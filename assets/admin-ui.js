@@ -4,7 +4,10 @@
    - Font: select con ricerca su tutti i Google Fonts (assets/data/google-fonts.json), filtro per categoria, tastiera
      (frecce, Invio, Esc). Nell'anteprima il font si carica da Google solo qui, in wp-admin: la pagina di accesso usa
      la copia scaricata sul sito al salvataggio.
-   - "Modifiche non salvate" nella barra in basso. */
+   - Entrata della schermata di accesso: miniature, anteprima che si può rivedere ("Rivedi l'entrata").
+   - Bacheca: miniatura con i colori che avrà la bacheca, secondo l'aspetto scelto.
+   - Barra delle sezioni: porta alla scheda e accende quella che si sta guardando.
+   - "Modifiche non salvate" nella barra in basso, rotellina mentre si salva. */
 (function () {
 	var root = document.querySelector('.lu3g-admin');
 	if (!root || !window.LU3GLogin) return;
@@ -86,7 +89,36 @@
 		$('#lu3g-anims').style.setProperty('--anim-logo', 'url("' + (layout === 'sito' && logo ? logo.replace(/"/g, '%22') : LU3GLogin.lu3g) + '")');
 		$('#lu3g-anims').style.setProperty('--anim-bg', layout === 'sito' ? field('bg').value : '#09090b');
 		$('#lu3g-anims').style.setProperty('--anim-line', layout === 'sito' ? field('accent').value : '#fafafa');
+
+		// entrata: scelta visibile solo con le animazioni accese, miniature nei colori dell'aspetto
+		var entries = $('#lu3g-entries');
+		entries.hidden = !(field('motion') && field('motion').checked);
+		entries.style.setProperty('--anim-bg', layout === 'sito' ? field('bg').value : '#09090b');
+		entries.style.setProperty('--anim-line', layout === 'sito' ? field('accent').value : '#fafafa');
+		var entry = checked('motion_style') || 'sale';
+		if (pv.getAttribute('data-entry') !== entry) { pv.setAttribute('data-entry', entry); replay(); }
+
+		// bacheca: miniatura con i colori del menu, della voce attiva e dei pulsanti (gli stessi di includes/class-dashboard.php)
+		$('#lu3g-dashbox').hidden = !(field('dashboard') && field('dashboard').checked);
+		var dash = $('#lu3g-dash');
+		if (layout === 'sito') {
+			var dbg = field('bg').value, dacc = field('accent').value;
+			dash.style.setProperty('--d-menu', dbg);
+			dash.style.setProperty('--d-text', lum(dbg) < 0.4 ? '#f0f0f1' : '#1d2327');
+			dash.style.setProperty('--d-acc', dacc);
+			dash.style.setProperty('--d-btn', dacc);
+		} else {
+			['--d-menu', '--d-text', '--d-acc', '--d-btn'].forEach(function (v) { dash.style.removeProperty(v); });
+		}
 	}
+
+	/* ---------- anteprima: rivedi l'entrata ---------- */
+	function replay() {
+		pv.classList.remove('is-play');
+		void pv.offsetWidth; // nuovo calcolo: l'animazione riparte da capo
+		if (!field('motion') || field('motion').checked) pv.classList.add('is-play');
+	}
+	$('#lu3g-replay').addEventListener('click', replay);
 	function rgb(h) { h = h.replace('#', ''); return [0, 2, 4].map(function (i) { return parseInt(h.substr(i, 2), 16) || 0; }); }
 	function shade(h, t) { return '#' + rgb(h).map(function (v) { return ('0' + Math.round(v * (1 - t)).toString(16)).slice(-2); }).join(''); }
 	function lum(h) {
@@ -185,6 +217,35 @@
 	var form = $('#lu3g-form'), dirty = $('#lu3g-dirty');
 	form.addEventListener('input', function () { dirty.hidden = false; update(); });
 	form.addEventListener('change', function () { dirty.hidden = false; update(); });
-	form.addEventListener('submit', function () { dirty.hidden = true; });
+	form.addEventListener('submit', function () {
+		dirty.hidden = true;
+		var b = $('#submit');
+		if (b) b.classList.add('is-saving');
+	});
+
+	/* ---------- barra delle sezioni ---------- */
+	var links = $$('.lu3g-nav a');
+	links.forEach(function (a) {
+		a.addEventListener('click', function (ev) {
+			var card = document.querySelector(a.getAttribute('href'));
+			if (!card) return;
+			ev.preventDefault();
+			var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+			card.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' });
+			card.classList.add('is-flash');
+			setTimeout(function () { card.classList.remove('is-flash'); }, 900);
+		});
+	});
+	if ('IntersectionObserver' in window) {
+		var io = new IntersectionObserver(function (list) {
+			list.forEach(function (en) {
+				if (!en.isIntersecting) return;
+				links.forEach(function (a) { a.classList.toggle('is-on', a.getAttribute('href') === '#' + en.target.id); });
+			});
+		}, { rootMargin: '-30% 0px -60% 0px' });
+		$$('.lu3g-card[id]').forEach(function (c) { io.observe(c); });
+	}
+
 	update();
+	replay();
 })();

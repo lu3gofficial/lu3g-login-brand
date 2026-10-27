@@ -1,6 +1,6 @@
 /* LU3G Login Brand – pagina delle impostazioni (Impostazioni → Accesso LU3G).
-   Stile vicino al Report LU3G: DM Sans (inclusa nel plugin), schede bianche con bordi sottili, intestazione scura,
-   anteprima fissa a destra. Le schede .lu3g-only-sito / .lu3g-only-report si mostrano secondo l'aspetto scelto. */
+   Stile vicino al Tema LU3G: DM Sans (inclusa nel plugin), schede bianche con bordi sottili, intestazione scura,
+   barra delle sezioni, anteprima fissa a destra. Animazioni solo con prefers-reduced-motion: no-preference (in fondo). Le schede .lu3g-only-sito / .lu3g-only-report si mostrano secondo l'aspetto scelto. */
 
 @font-face { font-family: "DM Sans Variable"; font-weight: 100 1000; font-display: swap;
 	src: url("fonts/dm-sans-latin-wght.woff2") format("woff2-variations"); }
@@ -13,7 +13,9 @@
 .lu3g-admin *, .lu3g-admin *::before, .lu3g-admin *::after { box-sizing: border-box; }
 
 /* intestazione */
-.lu3g-head { display: flex; align-items: center; gap: 14px; padding: 18px 22px; border-radius: 12px; background: var(--dark); color: #fafafa; }
+.lu3g-head { position: relative; display: flex; align-items: center; gap: 14px; padding: 18px 22px; border-radius: 12px; background: var(--dark); color: #fafafa; overflow: hidden; }
+.lu3g-head > * { position: relative; }
+.lu3g-head::before { content: ""; position: absolute; inset: 0; background: radial-gradient(60% 140% at 0% 0%, rgba(255, 255, 255, .09), transparent 60%); pointer-events: none; }
 .lu3g-head img { display: block; }
 .lu3g-head p { margin: 0; }
 .lu3g-head__title { font-family: "Manrope Variable", sans-serif; font-size: 20px; font-weight: 700; letter-spacing: -.5px; }
@@ -197,7 +199,7 @@
 .lu3g-pv__btn { display: flex; justify-content: space-between; margin-top: 12px; padding: 10px 12px; border-radius: 6px; font-size: 10px; font-weight: 600; }
 .lu3g-pv__btn::after { content: "↗"; }
 .lu3g-pv__links { display: flex; justify-content: center; gap: 12px; margin: 12px 0 0; font-size: 9px; }
-/* anteprima: aspetto Report */
+/* anteprima: aspetto Tema LU3G */
 .lu3g-pv[data-layout="report"] { background: #09090b; color: #fafafa; }
 .lu3g-pv[data-layout="report"] .lu3g-pv__site { display: none; }
 .lu3g-pv[data-layout="report"] .lu3g-pv__label { color: #d4d4d8; }
@@ -219,6 +221,121 @@
 	margin: 4px -1px 0; padding: 12px 16px; border: 1px solid var(--line); border-radius: 12px 12px 0 0; background: rgba(255, 255, 255, .92); backdrop-filter: blur(8px); }
 .lu3g-savebar .lu3g-hint { margin: 0; color: #b45309; font-weight: 600; }
 
+/* barra delle sezioni */
+.lu3g-nav { position: sticky; top: 32px; z-index: 25; display: flex; flex-wrap: wrap; gap: 4px; margin: 12px 0 0; padding: 5px; border: 1px solid var(--line);
+	border-radius: 11px; background: rgba(255, 255, 255, .9); backdrop-filter: blur(8px); }
+.lu3g-nav a { padding: 6px 12px; border-radius: 7px; color: #3f3f46; font-size: 12px; font-weight: 600; text-decoration: none; transition: background-color .2s, color .2s; }
+.lu3g-nav a:hover { background: var(--soft); color: var(--ink); }
+.lu3g-nav a.is-on { background: var(--dark); color: #fafafa; }
+.lu3g-nav a:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; box-shadow: none; }
+.lu3g-admin[data-layout="report"] .lu3g-nav .lu3g-only-sito,
+.lu3g-admin[data-layout="sito"] .lu3g-nav .lu3g-only-report { display: none; }
+.lu3g-card { scroll-margin-top: 96px; transition: border-color .2s, box-shadow .2s; }
+.lu3g-card:hover { border-color: #d4d4d8; }
+.lu3g-card.is-flash { box-shadow: 0 0 0 3px rgba(9, 9, 11, .08); border-color: #a1a1aa; }
+@media (max-width: 782px) { .lu3g-nav { top: 46px; } }
+
+/* entrata della schermata di accesso: quattro miniature (logo, due campi, pulsante) in loop di 2,8 s */
+.lu3g-entries { margin-bottom: 14px; }
+.lu3g-entries__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.lu3g-entry__stage { background: var(--anim-bg); }
+.lu3g-entry__stage i, .lu3g-entry__stage b, .lu3g-entry__stage em { position: absolute; left: 50%; width: 52%; transform: translateX(-50%); border-radius: 2px; }
+.lu3g-entry__stage i { top: 12px; width: 10px; height: 10px; left: 24%; background: var(--anim-line); }
+.lu3g-entry__stage b { height: 8px; background: rgba(127, 127, 127, .35); }
+.lu3g-entry__stage b:nth-of-type(1) { top: 30px; }
+.lu3g-entry__stage b:nth-of-type(2) { top: 43px; }
+.lu3g-entry__stage em { top: 56px; height: 9px; background: var(--anim-line); }
+.lu3g-entry--sale .lu3g-entry__stage > * { animation: lu3g-a-sale 2.8s cubic-bezier(.22,1,.36,1) infinite; }
+.lu3g-entry--zoom .lu3g-entry__stage > * { animation: lu3g-a-zoom 2.8s cubic-bezier(.22,1,.36,1) infinite; }
+.lu3g-entry--sfocatura .lu3g-entry__stage > * { animation: lu3g-a-blur 2.8s ease infinite; }
+.lu3g-entry--cascata .lu3g-entry__stage > * { animation: lu3g-a-sale 2.8s cubic-bezier(.22,1,.36,1) infinite; }
+.lu3g-entry--cascata .lu3g-entry__stage b:nth-of-type(1) { animation-delay: .12s; }
+.lu3g-entry--cascata .lu3g-entry__stage b:nth-of-type(2) { animation-delay: .24s; }
+.lu3g-entry--cascata .lu3g-entry__stage em { animation-delay: .36s; }
+.lu3g-entry__stage i { animation-delay: 0s !important; }
+@keyframes lu3g-a-sale { 0% { opacity: 0; translate: 0 8px; } 25%, 80% { opacity: 1; translate: 0 0; } 95%, 100% { opacity: 0; } }
+@keyframes lu3g-a-zoom { 0% { opacity: 0; scale: .8; } 25%, 80% { opacity: 1; scale: 1; } 95%, 100% { opacity: 0; } }
+@keyframes lu3g-a-blur { 0% { opacity: 0; filter: blur(4px); } 30%, 80% { opacity: 1; filter: none; } 95%, 100% { opacity: 0; } }
+
+/* schermata di caricamento: le tre animazioni nuove */
+.lu3g-anim--apertura .lu3g-anim__curtain { animation: lu3g-a-doors 2.6s cubic-bezier(.76,0,.24,1) infinite; }
+.lu3g-anim--apertura .lu3g-anim__logo { animation: lu3g-a-out 2.6s ease infinite; }
+.lu3g-anim--zoom .lu3g-anim__curtain { animation: lu3g-a-out 2.6s ease infinite; }
+.lu3g-anim--zoom .lu3g-anim__logo { animation: lu3g-a-zoomout 2.6s cubic-bezier(.7,0,.84,0) infinite; }
+.lu3g-anim--scansione .lu3g-anim__curtain { animation: lu3g-a-outup 2.6s cubic-bezier(.22,1,.36,1) infinite; }
+.lu3g-anim--scansione .lu3g-anim__logo { animation: lu3g-a-outup 2.6s cubic-bezier(.22,1,.36,1) infinite; }
+.lu3g-anim--scansione .lu3g-anim__fx { z-index: 1; width: 24px; height: 24px; margin: -12px 0 0 -12px;
+	background: linear-gradient(105deg, transparent 35%, rgba(127, 127, 127, .9) 50%, transparent 65%) 150% 0 / 250% 100% no-repeat;
+	-webkit-mask: var(--anim-logo) center / contain no-repeat; mask: var(--anim-logo) center / contain no-repeat;
+	animation: lu3g-a-scan 2.6s ease-in-out infinite; }
+@keyframes lu3g-a-doors { 0%, 50% { clip-path: inset(0 0 0 0); } 75%, 100% { clip-path: inset(0 50% 0 50%); } }
+@keyframes lu3g-a-zoomout { 0%, 45% { transform: scale(1); opacity: 1; } 70%, 100% { transform: scale(5); opacity: 0; } }
+@keyframes lu3g-a-scan { 0% { background-position: 150% 0; } 20% { background-position: -50% 0; } 21% { background-position: 150% 0; } 41% { background-position: -50% 0; } 55%, 100% { background-position: -50% 0; opacity: 1; } 75% { opacity: 0; } }
+
+/* bacheca: miniatura con barra in alto, menu laterale (una voce attiva) e pagina chiara con un pulsante */
+.lu3g-dashbox { margin: 4px 0 0 48px; }
+.lu3g-dashbox[hidden] { display: none; }
+.lu3g-dash { --d-menu: #09090b; --d-sub: #171719; --d-text: #d4d4d8; --d-acc: #fafafa; --d-btn: #09090b;
+	display: grid; grid-template-columns: 74px 1fr; grid-template-rows: 14px 1fr; height: 128px; margin-bottom: 4px; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; background: #f0f0f1; }
+.lu3g-dash > span { display: block; }
+.lu3g-dash__bar { grid-column: 1 / -1; display: flex !important; align-items: center; gap: 6px; padding: 0 8px; background: var(--d-menu); transition: background .3s; }
+.lu3g-dash__bar i { width: 18px; height: 4px; border-radius: 2px; background: var(--d-text); opacity: .6; }
+.lu3g-dash__menu { display: grid !important; align-content: start; gap: 4px; padding: 8px 0; background: var(--d-menu); transition: background .3s; }
+.lu3g-dash__menu i { height: 12px; margin: 0 8px; border-radius: 3px; background: var(--d-text); opacity: .25; }
+.lu3g-dash__menu i.is-on { margin: 0; border-radius: 0; background: var(--d-acc); opacity: 1; transition: background .3s; }
+.lu3g-dash__page { position: relative; padding: 12px 14px; }
+.lu3g-dash__page b { display: block; height: 8px; margin-bottom: 7px; border-radius: 2px; background: #dcdcde; }
+.lu3g-dash__page b:first-child { width: 40%; height: 10px; background: #3c434a; }
+.lu3g-dash__page b:nth-child(3) { width: 70%; }
+.lu3g-dash__page em { display: block; width: 64px; height: 18px; margin-top: 12px; border-radius: 4px; background: var(--d-btn); transition: background .3s; }
+
+/* anteprima: rivedi l'entrata */
+.lu3g-replay { margin-left: 8px; padding: 3px 8px; border: 1px solid var(--line); border-radius: 6px; background: #fff; color: #3f3f46; font: inherit; font-size: 11px; font-weight: 600; cursor: pointer; }
+.lu3g-replay:hover { background: var(--soft); color: var(--ink); }
+.lu3g-replay:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+/* salvataggio in corso */
+.lu3g-admin .button.lu3g-btn--primary.is-saving { pointer-events: none; opacity: .75; }
+.lu3g-admin .button.lu3g-btn--primary.is-saving::after { content: ""; width: 12px; height: 12px; margin-left: 4px; border: 2px solid rgba(250, 250, 250, .35);
+	border-top-color: #fafafa; border-radius: 50%; animation: lu3g-a-spin .7s linear infinite; }
+
+@media (max-width: 900px) { .lu3g-dashbox { margin-left: 0; } .lu3g-entries__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* animazioni della pagina (mai con "riduci animazioni") */
+@media (prefers-reduced-motion: no-preference) {
+	@keyframes lu3g-p-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+	.lu3g-head, .lu3g-nav, .lu3g-card, .lu3g-preview { animation: lu3g-p-in .5s cubic-bezier(.22,1,.36,1) backwards; }
+	.lu3g-nav { animation-delay: .05s; }
+	.lu3g-col > .lu3g-card:nth-child(2) { animation-delay: .08s; }
+	.lu3g-col > .lu3g-card:nth-child(3) { animation-delay: .12s; }
+	.lu3g-col > .lu3g-card:nth-child(4) { animation-delay: .16s; }
+	.lu3g-col > .lu3g-card:nth-child(n+5) { animation-delay: .2s; }
+	.lu3g-preview { animation-delay: .1s; }
+	.lu3g-tile, .lu3g-anim { transition: border-color .15s, box-shadow .15s, transform .25s cubic-bezier(.22,1,.36,1); }
+	.lu3g-tile:hover, .lu3g-anim:hover { transform: translateY(-2px); }
+	.lu3g-switch:active .lu3g-switch__track::after { width: 20px; }
+	.lu3g-switch input:checked:active + .lu3g-switch__track::after { transform: translateX(12px); }
+	.lu3g-btn:active, .lu3g-admin .button.lu3g-btn:active { transform: scale(.97); }
+	.lu3g-anims:not([hidden]), .lu3g-dashbox:not([hidden]) { animation: lu3g-p-in .35s cubic-bezier(.22,1,.36,1); }
+	.lu3g-combo__list:not([hidden]) { animation: lu3g-p-pop .16s ease; }
+	@keyframes lu3g-p-pop { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+	/* anteprima: entrata come sulla schermata di accesso (classe is-play messa da admin-ui.js) */
+	.lu3g-pv.is-play .lu3g-pv__inner > * { animation: lu3g-pv-sale .6s cubic-bezier(.22,1,.36,1) backwards; }
+	.lu3g-pv.is-play .lu3g-pv__inner > :nth-child(2) { animation-delay: .06s; }
+	.lu3g-pv.is-play .lu3g-pv__inner > :nth-child(3) { animation-delay: .12s; }
+	.lu3g-pv.is-play .lu3g-pv__inner > :nth-child(4) { animation-delay: .2s; }
+	.lu3g-pv.is-play[data-entry="zoom"] .lu3g-pv__inner > * { animation-name: lu3g-pv-zoom; }
+	.lu3g-pv.is-play[data-entry="sfocatura"] .lu3g-pv__inner > * { animation-name: lu3g-pv-blur; }
+	.lu3g-pv.is-play[data-entry="cascata"] .lu3g-pv__form > * { animation: lu3g-pv-sale .5s cubic-bezier(.22,1,.36,1) backwards; }
+	.lu3g-pv.is-play[data-entry="cascata"] .lu3g-pv__form > :nth-child(2) { animation-delay: .25s; }
+	.lu3g-pv.is-play[data-entry="cascata"] .lu3g-pv__form > :nth-child(3) { animation-delay: .32s; }
+	.lu3g-pv.is-play[data-entry="cascata"] .lu3g-pv__form > :nth-child(4) { animation-delay: .39s; }
+	.lu3g-pv.is-play[data-entry="cascata"] .lu3g-pv__form > :nth-child(5) { animation-delay: .46s; }
+	@keyframes lu3g-pv-sale { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+	@keyframes lu3g-pv-zoom { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: none; } }
+	@keyframes lu3g-pv-blur { from { opacity: 0; filter: blur(8px); transform: translateY(4px); } to { opacity: 1; filter: none; transform: none; } }
+}
+
 @media (max-width: 1100px) {
 	.lu3g-grid { grid-template-columns: 1fr; }
 	.lu3g-preview { position: static; order: -1; }
@@ -231,4 +348,5 @@
 }
 @media (prefers-reduced-motion: reduce) {
 	.lu3g-admin * { transition: none !important; }
+	.lu3g-admin .button.lu3g-btn--primary.is-saving::after { animation: none; }
 }

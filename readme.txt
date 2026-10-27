@@ -1,10 +1,10 @@
 === LU3G Login Brand ===
-Versione: 1.6.1
+Versione: 1.7.0
 Richiede: WordPress 6.0+, PHP 7.4+
 
 Personalizza la sola schermata di accesso a wp-admin con lo stile del sito su cui è installato
 (logo, colore scuro, colore dei pulsanti, font) e affianca il logo LU3G al logo del sito.
-Il resto di wp-admin non viene toccato.
+Facoltativo (Impostazioni → Accesso LU3G → Bacheca, spento di serie): gli stessi colori in tutta la bacheca di WordPress.
 
 == Installazione su un nuovo sito ==
 1. Plugin → Aggiungi nuovo → Carica plugin → scegli lu3g-login-brand.zip → Installa → Attiva.

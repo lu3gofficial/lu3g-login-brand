@@ -1,6 +1,7 @@
 <?php
 /**
- * Aspetto "Report LU3G": la schermata di accesso riprodotta da https://report.lu3g.com/login.
+ * Aspetto "Tema LU3G" (prima "Report LU3G"; il valore salvato resta 'report'): la schermata di accesso riprodotta da
+ * https://report.lu3g.com/login.
  *
  * Fondo quasi nero #09090b, colonna centrale di 390px, logo LU3G 46px allineato a sinistra, titolo in Manrope 30px,
  * etichette 13px, campi scuri (#171719, bordo #2b2b30, raggio 6px, alti 46px), occhio della password con l'icona originale
@@ -171,12 +172,23 @@ final class LU3G_Login_Report {
 
 		// da telefono l'app tiene lo stesso margine di 24px (la sua regola per il mobile è sovrascritta): nessuna regola qui
 
-		// animazione d'entrata leggera (opzione "Animazioni"; mai con "riduci animazioni")
+		// animazioni (opzione "Animazioni"; mai con "riduci animazioni"):
+		// - entrata scelta nelle impostazioni (Sale, Zoom, Sfocatura, Cascata) per logo, titolo, modulo e link;
+		// - logo che ruota appena al passaggio del mouse;
+		// - campi: bordo che si schiarisce ed etichetta che si accende quando ci si scrive;
+		// - pulsante: la freccia scatta in alto a destra all'hover, piccola pressione al clic;
+		// - occhio della password: leggero ingrandimento al passaggio del mouse.
 		if ( ! empty( $o['motion'] ) ) {
-			$css .= '@media (prefers-reduced-motion:no-preference){@keyframes lu3g-r-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}'
-				. 'body.login #login h1,body.login .lu3g-titolo,body.login form,body.login .lu3g-link{animation:lu3g-r-in .6s cubic-bezier(.22,1,.36,1) backwards}'
+			$e    = 'cubic-bezier(.22,1,.36,1)';
+			$css .= '@media (prefers-reduced-motion:no-preference){' . LU3G_Login_Brand::entry_css( $o )
+				. "body.login #login h1,body.login .lu3g-titolo,body.login form,body.login .lu3g-link{animation:lu3g-e .6s {$e} backwards}"
 				. 'body.login .lu3g-titolo{animation-delay:.06s}body.login form{animation-delay:.12s}body.login .lu3g-link{animation-delay:.2s}'
-				. 'body.wp-core-ui.login .button-primary:active{transform:scale(.99)}}';
+				. "body.login #login h1 a{transition:transform .5s {$e}}body.login #login h1 a:hover{transform:rotate(-8deg) scale(1.04)}"
+				. "body.login form label{transition:color .2s ease}body.login form p:focus-within label,body.login .user-pass-wrap:focus-within label{color:{$ink}}"
+				. "body.wp-core-ui.login .button-primary,body.wp-core-ui.login #wp-submit{transition:background-color .15s,background-position .35s {$e},transform .15s}"
+				. 'body.wp-core-ui.login .button-primary:hover,body.wp-core-ui.login #wp-submit:hover{background-position:right 13px top 11px}'
+				. 'body.wp-core-ui.login .button-primary:active{transform:scale(.99)}'
+				. "body.login .button.wp-hide-pw .dashicons{transition:transform .25s {$e}}body.login .button.wp-hide-pw:hover .dashicons{transform:scale(1.12)}}";
 		}
 		return $css;
 	}

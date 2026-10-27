@@ -1,12 +1,15 @@
 <?php
 /**
- * Schermata di caricamento dopo l'accesso (opzione "Schermata di caricamento", attiva di serie), con sei animazioni:
+ * Schermata di caricamento dopo l'accesso (opzione "Schermata di caricamento", attiva di serie), con nove animazioni:
  *   linea      logo che cresce e riga di avanzamento, poi dissolvenza con scorrimento verso l'alto (predefinita)
  *   dissolvenza logo che compare piano, poi tutto sfuma
  *   pulsazione logo che pulsa due volte con un alone leggero, poi dissolvenza
  *   anello     anello che gira intorno al logo, poi dissolvenza
  *   sipario    logo che compare, poi la schermata sale come un sipario e scopre la pagina
  *   cerchio    logo che compare, poi la schermata si chiude in un cerchio verso il centro
+ *   apertura   logo che compare, poi la schermata si apre dal centro verso i lati come due ante
+ *   zoom       logo che compare, poi si ingrandisce verso chi guarda mentre la schermata sfuma
+ *   scansione  una luce passa sul logo due volte, poi la schermata sale e sfuma
  *
  * Come funziona:
  * - Compare UNA volta, sulla prima pagina dopo il login: al login si salva un segnale sull'utente (user meta con l'ora),
@@ -36,6 +39,9 @@ final class LU3G_Login_Splash {
 			'anello'      => array( 'Anello', 'Un anello gira intorno al logo, come un caricamento.' ),
 			'sipario'     => array( 'Sipario', 'La schermata sale come un sipario e scopre la pagina.' ),
 			'cerchio'     => array( 'Cerchio', 'La schermata si chiude in un cerchio verso il logo.' ),
+			'apertura'    => array( 'Apertura', 'La schermata si apre dal centro verso i lati.' ),
+			'zoom'        => array( 'Zoom', 'Il logo si ingrandisce verso di te mentre tutto sfuma.' ),
+			'scansione'   => array( 'Scansione', 'Una luce passa sul logo, poi la schermata sale.' ),
 		);
 	}
 
@@ -145,6 +151,32 @@ final class LU3G_Login_Splash {
 				$css .= '@keyframes lu3g-s-iris{from{clip-path:circle(75% at 50% 50%)}to{clip-path:circle(0% at 50% 50%);visibility:hidden}}';
 				$css .= ".lu3g-splash__logo{animation:lu3g-s-in .5s {$e} both}";
 				$out  = 'lu3g-s-iris .7s cubic-bezier(.76,0,.24,1) 1.1s forwards';
+				break;
+
+			case 'apertura':
+				$css .= '@keyframes lu3g-s-doors{from{clip-path:inset(0 0 0 0)}to{clip-path:inset(0 50% 0 50%);visibility:hidden}}';
+				$css .= ".lu3g-splash__logo{animation:lu3g-s-in .5s {$e} both}";
+				$out  = 'lu3g-s-doors .75s cubic-bezier(.76,0,.24,1) 1.1s forwards';
+				break;
+
+			case 'zoom':
+				// il logo cresce per conto suo; fondo e contenitore sfumano insieme
+				$css .= '@keyframes lu3g-s-zoom{to{transform:scale(6);opacity:0}}';
+				$css .= ".lu3g-splash__logo{animation:lu3g-s-in .5s {$e} both,lu3g-s-zoom .7s cubic-bezier(.7,0,.84,0) 1.05s forwards}";
+				$out  = 'lu3g-s-out .45s ease 1.3s forwards';
+				break;
+
+			case 'scansione':
+				// una fascia che scorre sopra il logo, visibile solo dentro la sua forma (maschera): scura sui loghi chiari,
+				// chiara sui loghi scuri
+				$light = $report || 'dark' !== ( $o['logo_tone'] ?? 'light' );
+				$band  = $light ? self::rgba( $bg, '.7' ) : 'rgba(255,255,255,.85)';
+				$css  .= '@keyframes lu3g-s-scan{from{background-position:150% 0}to{background-position:-50% 0}}';
+				$css  .= ".lu3g-splash__fx{position:relative;z-index:1;width:{$w}px;height:{$h}px;background:linear-gradient(105deg,transparent 35%,{$band} 50%,transparent 65%) 150% 0/250% 100% no-repeat;"
+					. "-webkit-mask:url(\"{$logo}\") center/contain no-repeat;mask:url(\"{$logo}\") center/contain no-repeat;"
+					. 'animation:lu3g-s-scan .65s ease-in-out .35s 2 both}';
+				$css  .= ".lu3g-splash__logo{animation:lu3g-s-in .5s {$e} both}";
+				$out   = "lu3g-s-out-up .55s {$e} 1.4s forwards";
 				break;
 
 			default: // linea

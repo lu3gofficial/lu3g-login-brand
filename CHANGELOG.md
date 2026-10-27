@@ -1,5 +1,19 @@
 # Registro delle modifiche
 
+## 1.7.0 – 2026-10-27
+- L'aspetto "Report LU3G" si chiama ora **Tema LU3G** (il valore salvato resta lo stesso: nessuna impostazione da rifare).
+- Nuova scheda **Bacheca** (spenta di serie): i colori dell'aspetto scelto in tutta la bacheca di WordPress – menu laterale,
+  barra in alto (anche sul sito), pulsanti, link, campi e componenti dell'editor a blocchi. Con "Tema LU3G" nero e bianco
+  come report.lu3g.com, con "Colori del sito" fondo e accento del sito; testi sempre calcolati per restare leggibili.
+  "Animazioni nella bacheca": pagine che entrano, sottomenu e menu della barra a comparsa, pulsanti con pressione al clic,
+  riquadri della bacheca in sequenza (mai nell'editor a blocchi, mai con "riduci animazioni").
+- Schermata di accesso: quattro entrate a scelta (Sale, Zoom, Sfocatura, Cascata) con miniature animate; messaggi che
+  scendono dall'alto ed errore con un piccolo scatto. Tema LU3G: freccia del pulsante che scatta all'hover, logo che ruota
+  appena, etichette che si accendono, occhio della password animato.
+- Schermata di caricamento: tre animazioni nuove (Apertura, Zoom, Scansione), nove in tutto.
+- Pagina delle impostazioni: barra delle sezioni che segue lo scorrimento, schede che entrano in sequenza, "Rivedi l'entrata"
+  nell'anteprima, miniatura della bacheca con i colori che avrà, rotellina durante il salvataggio.
+
 ## 1.6.1 – 2026-10-27
 - Il repository è passato all'organizzazione GitHub lu3gofficial: aggiornati Plugin URI, Update URI e sorgente
   degli aggiornamenti (lu3gofficial/lu3g-login-brand). I siti con versioni precedenti si aggiornano comunque,
