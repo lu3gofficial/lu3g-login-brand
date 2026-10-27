@@ -69,7 +69,8 @@ final class LU3G_Login_Admin {
 				<img src="<?php echo esc_attr( LU3G_Login_Brand::lu3g_logo( 'light' ) ); ?>" alt="" width="34" height="34">
 				<div>
 					<p class="lu3g-head__title">Accesso LU3G</p>
-					<p class="lu3g-head__sub">Schermata di accesso e bacheca di WordPress · versione <?php echo esc_html( $version ); ?></p>
+					<p class="lu3g-head__sub">Schermata di accesso e bacheca di WordPress · versione <?php echo esc_html( $version ); ?> ·
+						<a href="https://github.com/lu3gofficial/lu3g-login-brand/releases" target="_blank" rel="noopener">Novità ↗</a></p>
 				</div>
 				<a class="lu3g-btn lu3g-btn--ghost" href="<?php echo esc_url( wp_login_url() ); ?>" target="_blank" rel="noopener">Apri la schermata di accesso ↗</a>
 			</header>

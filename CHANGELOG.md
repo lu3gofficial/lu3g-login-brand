@@ -1,5 +1,9 @@
 # Registro delle modifiche
 
+## 1.7.2 – 2026-10-27
+- Pagina delle impostazioni: link "Novità" accanto alla versione, porta alle note delle release su GitHub.
+- Prima versione ricevuta in automatico dai siti passati a mano alla 1.7.1 (prova degli aggiornamenti da lu3gofficial).
+
 ## 1.7.1 – 2026-10-27
 - Aggiornamenti indipendenti dal proprietario del repository GitHub: senza token il pacchetto è il link pubblico di
   download (WordPress lo scarica da solo), con il token l'indirizzo API dell'allegato è riconosciuto qualunque sia il

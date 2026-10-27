@@ -20,6 +20,8 @@
 .lu3g-head p { margin: 0; }
 .lu3g-head__title { font-family: "Manrope Variable", sans-serif; font-size: 20px; font-weight: 700; letter-spacing: -.5px; }
 .lu3g-head__sub { color: #a1a1aa; font-size: 12px; margin-top: 2px !important; }
+.lu3g-head__sub a { color: #fafafa; text-decoration: none; }
+.lu3g-head__sub a:hover, .lu3g-head__sub a:focus { color: #d4d4d8; text-decoration: underline; box-shadow: none; }
 .lu3g-head .lu3g-btn { margin-left: auto; }
 
 /* griglia: impostazioni a sinistra, anteprima a destra */
