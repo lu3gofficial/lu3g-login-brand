@@ -1,5 +1,9 @@
 # Registro delle modifiche
 
+## 1.7.4
+- `includes/class-updater.php` ora è generato dal modello comune di [lu3g-updater](https://github.com/lu3gofficial/lu3g-updater) (1.0.0), a partire dal nuovo file `.lu3g-updater`. Rispetto a prima l'updater aggiunge da sé il link "Controlla aggiornamenti" nella pagina Plugin, quindi è stato tolto da `action_links()` del plugin (resta il link Impostazioni).
+- Release avviabile anche da GitHub, senza computer: *Actions → Release → Run workflow* sul branch `main`. Il tag lo crea l'automazione dalla `Version` del plugin, e si ferma se quella versione è già pubblicata.
+
 ## 1.7.3 – 2026-10-27
 - Pagina Plugin: link "Controlla aggiornamenti" nella riga del plugin, porta a Bacheca → Aggiornamenti e rilegge subito
   GitHub (senza aspettare le 6 ore della cache).
