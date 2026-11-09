@@ -1,5 +1,8 @@
 <?php
 /**
+ * FILE GENERATO da lu3g-updater 1.0.0 (github.com/lu3gofficial/lu3g-updater): non modificarlo a mano.
+ * Per cambiarlo si modifica il modello in lu3g-updater e si rigenera con bin/sync.sh (vedi il README di lu3g-updater).
+ *
  * Aggiornamenti del plugin da GitHub (repository pubblico lu3gofficial/lu3g-login-brand).
  *
  * Come funziona:
@@ -9,7 +12,7 @@
  *   WordPress mostra "Aggiornamento disponibile" come per ogni altro plugin;
  * - il pacchetto è il file "lu3g-login-brand.zip" allegato alla release (cartella lu3g-login-brand/ all'interno).
  *
- * Se il repository cambia proprietario o nome (come nel passaggio da sviluppolu3g a lu3gofficial, 1.7.1):
+ * Se il repository cambia proprietario o nome:
  * - GitHub rinvia il vecchio indirizzo al nuovo e wp_remote_get segue il rinvio, quindi il controllo trova la release;
  * - senza token il pacchetto è il link pubblico di download dell'allegato (github.com/.../releases/download/...),
  *   che WordPress scarica da solo senza passare da questo file;
@@ -45,6 +48,15 @@ final class LU3G_Login_Brand_Updater {
 		// "Controlla di nuovo" (update-core.php?force-check=1): la cache va svuotata PRIMA del controllo di WordPress,
 		// che è agganciato allo stesso evento con priorità 10; con priorità 1 si passa prima
 		add_action( 'load-update-core.php', array( __CLASS__, 'flush_on_force_check' ), 1 );
+		// pagina Plugin: link che rilegge subito GitHub, senza aspettare le 6 ore della cache
+		add_filter( 'plugin_action_links_' . plugin_basename( $plugin_file ), array( __CLASS__, 'action_links' ) );
+	}
+
+	public static function action_links( $links ) {
+		if ( current_user_can( 'update_plugins' ) ) {
+			$links[] = '<a href="' . esc_url( self_admin_url( 'update-core.php?force-check=1' ) ) . '">Controlla aggiornamenti</a>';
+		}
+		return $links;
 	}
 
 	private static function token() {
